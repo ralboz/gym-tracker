@@ -95,19 +95,25 @@ export default function HomeScreen(){
     }
 
     return (
-        <FlatList
-            data={[...workouts].sort((a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime())}
-            renderItem={renderWorkoutCard}
-            keyExtractor={workout => workout.id.toString()}
-            contentContainerStyle={styles.listContainer}
-            showsVerticalScrollIndicator={false}
-        />
+        <View style={{ flex: 1 }}>
+            <FlatList
+                data={[...workouts].sort((a, b) => new Date(b.created_date).getTime() - new Date(a.created_date).getTime())}
+                renderItem={renderWorkoutCard}
+                keyExtractor={workout => workout.id.toString()}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={[styles.listContainer, { paddingBottom: 24, flexGrow: 1 }]}
+            />
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     listContainer: {
-        padding: 16,
+        paddingLeft: 16,
+        paddingRight: 16,
+        marginTop: 48,
+        marginBottom: 90,
+        paddingBottom: 32
     },
     card: {
         backgroundColor: 'white',

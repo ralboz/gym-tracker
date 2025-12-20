@@ -43,3 +43,9 @@ export const updateWorkout = async (updatedWorkout: WorkoutDTO): Promise<Workout
     await saveWorkouts(updatedWorkouts);
     return updatedWorkout;
 };
+
+export const deleteWorkout = async (workoutId: number): Promise<void> => {
+    const workouts = await loadWorkouts();
+    const updatedWorkouts = workouts.filter(w => w.id !== workoutId);
+    await saveWorkouts(updatedWorkouts);
+};

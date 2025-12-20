@@ -15,7 +15,7 @@ import {
 import {Exercise, MuscleGroup, WorkoutDTO, WorkoutExerciseDTO, WorkoutSetDTO} from "@/data/types";
 import { Ionicons } from '@expo/vector-icons';
 import {useLocalSearchParams, useRouter} from "expo-router";
-import {saveNewWorkout, updateWorkout} from "@/data/workoutsUtils";
+import {deleteWorkout, saveNewWorkout, updateWorkout} from "@/data/workoutsUtils";
 import {loadExercises} from "@/data/dataUtils";
 import NumberWheel from "@/components/NumberWheel";
 
@@ -133,10 +133,36 @@ export default function AddScreen() {
         }
     }, [exercises, currentWorkout, router]);
 
-    const handleDeleteWorkout = useCallback(async () => {
-        resetState();
-        router.push('/');
-    },[router]);
+    const handleDeleteWorkout = useCallback(() => {
+        if(!workoutParam) {
+            // early return for case that user clicked to add new workout but didnt add anything to it yet
+            resetState();
+            router.push('/');
+        }
+        else
+        {
+            Alert.alert(
+                `${currentWorkout ? 'Delete' : 'Cancel'} Workout`,
+                `Are you sure you want to ${currentWorkout ? 'delete' : 'cancel'} this workout?`,
+                [
+                    { text: 'No', style: 'cancel' },
+                    {
+                        text: `Yes`,
+                        style: 'destructive',
+                        onPress: async () => {
+                            if(currentWorkout)
+                            {
+                                await deleteWorkout(currentWorkout.id)
+                            }
+                            resetState();
+                            router.push('/');
+                        }
+                    }
+                ]
+            );
+        }
+        
+    }, [workoutParam, currentWorkout, router]);
 
     // DeviceEventEmitter listeners
     useEffect(() => {

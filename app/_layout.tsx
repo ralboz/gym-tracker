@@ -52,7 +52,6 @@ function CustomTabBar({ state, descriptors, navigation }) {
                     style={styles.tabButton}
                     onPress={() => {
                         DeviceEventEmitter.emit('DELETE-WORKOUT');
-                        router.replace('/');
                     }}
                 >
                     <Ionicons name="trash-outline" size={24} color="#8E8E93" />
