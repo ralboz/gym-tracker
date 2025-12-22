@@ -1,29 +1,18 @@
-import { Tabs , useRouter } from 'expo-router';
+import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { View, TouchableOpacity, StyleSheet, DeviceEventEmitter } from 'react-native';
 import {clearAsyncStorage, dumpAsyncStorage, seedExercisesIfEmpty} from "@/data/dataUtils";
-import {useEffect} from "react";
+import {ComponentProps, useEffect} from "react";
+import type {
+    TabNavigationState,
+    NavigationHelpers,
+    ParamListBase
+} from '@react-navigation/native';
 
-const styles = StyleSheet.create({
-    tabBar: {
-        flexDirection: 'row',
-        backgroundColor: '#fff',
-        borderTopWidth: 1,
-        borderTopColor: '#eee',
-        height: 60,
-    },
-    tabButton: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-});
-
-
-function CustomTabBar({ state, descriptors, navigation }) {
-    const router = useRouter();
-
-    const currentRoute = state.routes[state.index];
+function CustomTabBar({state, navigation}: {
+    state: TabNavigationState<ParamListBase>;
+    navigation: NavigationHelpers<ParamListBase>;
+}) {    const currentRoute = state.routes[state.index];
     const isAddScreen = currentRoute.name === 'add/index';
 
     if (isAddScreen) {
@@ -60,28 +49,21 @@ function CustomTabBar({ state, descriptors, navigation }) {
         );
     }
 
+    type IconName = ComponentProps<typeof Ionicons>['name'];
+
+    const tabIcons: Record<string, IconName> = {
+        'index': 'home-outline',
+        'add/index': 'add-circle-outline',
+        'stats/index': 'stats-chart-outline',
+    } as const;
+
     // Default navigation bar
     return (
         <View style={styles.tabBar}>
-            {state.routes.map((route, index) => {
-                const { options } = descriptors[route.key];
+            {state.routes.map((route: { name: string; key: string }, index: number) => {
                 const isFocused = state.index === index;
 
-                let iconName;
-                switch (route.name) {
-                    case 'index':
-                        iconName = 'home-outline';
-                        break;
-                    case 'add/index':
-                        iconName = 'add-circle-outline';
-                        break;
-                    case 'stats/index':
-                        iconName = 'stats-chart-outline';
-                        break;
-                    default:
-                        iconName = 'question-circle-outline';
-                        break;
-                }
+                const iconName = tabIcons[route.name] ?? 'question-circle-outline';
 
                 const onPress = () => {
                     navigation.navigate(route.name);
@@ -125,3 +107,17 @@ export default function RootLayout() {
     );
 }
 
+const styles = StyleSheet.create({
+    tabBar: {
+        flexDirection: 'row',
+        backgroundColor: '#fff',
+        borderTopWidth: 1,
+        borderTopColor: '#eee',
+        height: 60,
+    },
+    tabButton: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+});
