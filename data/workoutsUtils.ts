@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {WorkoutDTO} from "@/data/types";
+import {ExerciseHistory, WorkoutDTO, WorkoutSetDTO} from "@/data/types";
 
 const WORKOUTS_KEY = 'workouts';
 
@@ -48,4 +48,35 @@ export const deleteWorkout = async (workoutId: number): Promise<void> => {
     const workouts = await loadWorkouts();
     const updatedWorkouts = workouts.filter(w => w.id !== workoutId);
     await saveWorkouts(updatedWorkouts);
+};
+
+export const getExerciseHistory = async (exerciseId: number): Promise<ExerciseHistory> => {
+    const workouts = await loadWorkouts();
+
+    const relevantWorkouts = workouts
+        .filter(w => w.exercises.some(e => e.id === exerciseId))
+        .sort((a, b) => b.created_date - a.created_date);
+
+    const recentWorkouts = relevantWorkouts.slice(0, 4);
+
+    // Find PR set across all workouts
+    let prSet: WorkoutSetDTO | null = null;
+    let maxWeight = -1;
+
+    for (const workout of relevantWorkouts) {
+        const exerciseInstance = workout.exercises.find(e => e.id === exerciseId);
+        if (exerciseInstance) {
+            for (const set of exerciseInstance.sets) {
+                if (set.weight > maxWeight) {
+                    maxWeight = set.weight;
+                    prSet = set;
+                }
+            }
+        }
+    }
+
+    return {
+        prSet,
+        recentWorkouts,
+    };
 };

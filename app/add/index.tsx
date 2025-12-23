@@ -16,6 +16,7 @@ import { NumberWheelModal } from "@/components/NumberWheelModal";
 import { NotesModal } from "@/components/NotesModal";
 import { ExerciseSearchModal } from "@/components/ExerciseSearchModal";
 import {ExerciseCard} from "@/components/ExerciseCard";
+import { ExerciseInfoModal } from "@/components/ExerciseInfoModal";
 
 const LoadingState = () => (
     <View style={styles.container}>
@@ -44,9 +45,11 @@ export default function AddScreen() {
 
     // UI state
     const [loading, setLoading] = useState(true);
-    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isExerciseSearchModalVisible, setIsExerciseSearchModalVisible] = useState(false);
     const [isNotesModalVisible, setIsNotesModalVisible] = useState(false);
     const [isNumberWheelVisible, setIsNumberWheelVisible] = useState(false);
+    const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
+    const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
 
     // Editing state
     const [currentEditingWorkout, setCurrentEditingWorkout] = useState<WorkoutExerciseDTO | null>(null);
@@ -64,7 +67,7 @@ export default function AddScreen() {
         setEditingSetIndex(null);
         setEditingField(null);
         setPendingSet(null);
-        setIsModalVisible(false);
+        setIsExerciseSearchModalVisible(false);
         setIsNotesModalVisible(false);
         setIsNumberWheelVisible(false);
     };
@@ -180,7 +183,7 @@ export default function AddScreen() {
             notes: "",
         };
         setExercises(prev => [...prev, newWorkoutExercise]);
-        setIsModalVisible(false);
+        setIsExerciseSearchModalVisible(false);
     }, []);
 
     const handleDeleteExercise = useCallback((exerciseId: number) => {
@@ -293,9 +296,14 @@ export default function AddScreen() {
         setCurrentEditingWorkout(null);
     }, []);
 
+    const handleShowExerciseInfo = useCallback((workoutExercise: WorkoutExerciseDTO) => {
+        setSelectedExercise(workoutExercise);
+        setIsInfoModalVisible(true);
+    }, []);
+
     // DeviceEventEmitter listeners
     useEffect(() => {
-        const handleAddExercise = () => setIsModalVisible(true);
+        const handleAddExercise = () => setIsExerciseSearchModalVisible(true);
 
         const subscription1 = DeviceEventEmitter.addListener('ADD-EXERCISE', handleAddExercise);
         const subscription2 = DeviceEventEmitter.addListener('SAVE-WORKOUT', handleSaveWorkout);
@@ -333,6 +341,7 @@ export default function AddScreen() {
                             onDeleteSet={handleDeleteSet}
                             onEditSet={handleOpenNumberWheel}
                             onShowNotes={handleShowNoteInput}
+                            onShowExerciseInfo={handleShowExerciseInfo}
                         />
                     ))}
                 </ScrollView>
@@ -356,11 +365,18 @@ export default function AddScreen() {
             />
 
             <ExerciseSearchModal
-                visible={isModalVisible}
+                visible={isExerciseSearchModalVisible}
                 availableExercises={availableExercises}
                 onAddExercise={handleAddExercise}
-                onClose={() => setIsModalVisible(false)}
+                onClose={() => setIsExerciseSearchModalVisible(false)}
             />
+
+            <ExerciseInfoModal
+                visible={isInfoModalVisible}
+                exercise={selectedExercise}
+                onClose={() => setIsInfoModalVisible(false)}
+            />
+
         </View>
     );
 }

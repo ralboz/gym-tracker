@@ -15,9 +15,10 @@ interface ExerciseCardProps {
         field: 'weight' | 'reps'
     ) => void;
     onShowNotes: (workoutExercise: WorkoutExerciseDTO) => void;
+    onShowExerciseInfo: (workoutExercise: WorkoutExerciseDTO) => void;
 }
 
-export const ExerciseCard: React.FC<ExerciseCardProps> = ({workoutExercise, onDeleteExercise, onAddSet, onDeleteSet, onEditSet, onShowNotes}) =>
+export const ExerciseCard: React.FC<ExerciseCardProps> = ({workoutExercise, onDeleteExercise, onAddSet, onDeleteSet, onEditSet, onShowNotes, onShowExerciseInfo}) =>
 {
     return (
         <View style={styles.exerciseCard}>
@@ -70,6 +71,12 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({workoutExercise, onDe
                     style={styles.actionBtn}
                 >
                     <Ionicons name="create-outline" size={20} color="#007AFF"/>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => onShowExerciseInfo(workoutExercise)}
+                    style={styles.actionBtn}
+                >
+                    <Ionicons name="information-circle-outline" size={20} color="#007AFF"/>
                 </TouchableOpacity>
             </View>
         </View>

@@ -28,3 +28,8 @@ export interface WorkoutDTO {
   created_date: number;
   exercises: WorkoutExerciseDTO[];
 }
+
+export interface ExerciseHistory {
+  prSet: WorkoutSetDTO | null;
+  recentWorkouts: WorkoutDTO[];
+}
