@@ -54,7 +54,7 @@ function CustomTabBar({state, navigation}: {
     const tabIcons: Record<string, IconName> = {
         'index': 'home-outline',
         'add/index': 'add-circle-outline',
-        'stats/index': 'stats-chart-outline',
+        'settings/index': 'settings-outline',
     } as const;
 
     // Default navigation bar
@@ -102,7 +102,7 @@ export default function RootLayout() {
         >
             <Tabs.Screen name="index" options={{ title: "Home" }} />
             <Tabs.Screen name="add/index" options={{ title: "Add" }} />
-            <Tabs.Screen name="stats/index" options={{ title: "Stats" }} />
+            <Tabs.Screen name="settings/index" options={{ title: "Settings" }} />
         </Tabs>
     );
 }

@@ -10,14 +10,7 @@ import {
 } from "react-native";
 import React, {useMemo, useState} from "react";
 import {Exercise, MuscleGroup} from "@/data/types";
-
-const muscleGroups: MuscleGroup[] = [
-    'chest', 'back', 'shoulders', 'rear_delts', 'traps',
-    'biceps', 'triceps', 'forearms',
-    'quads', 'hamstrings', 'glutes', 'calves',
-    'abs', 'obliques', 'hip_flexors', 'core',
-    'posterior_chain', 'full_body',
-];
+import { MUSCLE_GROUPS } from '@/data/muscleGroups';
 
 interface ExerciseSearchModalProps {
     visible: boolean;
@@ -84,7 +77,7 @@ export const ExerciseSearchModal: React.FC<ExerciseSearchModalProps> = ({visible
                         >
                             <Text style={!selectedMuscle ? {color: 'white'} : {}}>All</Text>
                         </TouchableOpacity>
-                        {muscleGroups.map(group => (
+                        {MUSCLE_GROUPS.map(group => (
                             <TouchableOpacity
                                 key={group}
                                 onPress={() => setSelectedMuscle(selectedMuscle === group ? null : group)}

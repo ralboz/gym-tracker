@@ -17,6 +17,23 @@ export const loadExercises = async (): Promise<Exercise[]> => {
     return JSON.parse(json) as Exercise[];
 };
 
+export const createExercise = async (exercise: Omit<Exercise, 'id'>) => {
+    const currentExercises = await loadExercises();
+
+    const maxId = currentExercises.length > 0
+        ? Math.max(...currentExercises.map(ex => ex.id))
+        : 0;
+    const newId = maxId + 1;
+
+    const exerciseWithId: Exercise = {
+        ...exercise,
+        id: newId
+    };
+
+    currentExercises.push(exerciseWithId);
+    await AsyncStorage.setItem(EXERCISES_KEY, JSON.stringify(currentExercises));
+};
+
 export const dumpAsyncStorage = async () => {
     const keys = await AsyncStorage.getAllKeys();
     const entries = await AsyncStorage.multiGet(keys);

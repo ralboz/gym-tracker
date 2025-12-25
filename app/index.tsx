@@ -77,7 +77,7 @@ export default function HomeScreen(){
 
                 <View style={styles.cardActions}>
                     <TouchableOpacity style={styles.button} onPress={() => {
-                        router.push(`/add?workout=${encodeURIComponent(JSON.stringify(workout))}&t=${Date.now()}`);
+                        router.push(`/add?workout=${encodeURIComponent(JSON.stringify(workout))}`);
                     }}>
                         <Text style={styles.buttonText}>Edit</Text>
                     </TouchableOpacity>

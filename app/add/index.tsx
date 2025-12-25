@@ -17,6 +17,7 @@ import { NotesModal } from "@/components/NotesModal";
 import { ExerciseSearchModal } from "@/components/ExerciseSearchModal";
 import {ExerciseCard} from "@/components/ExerciseCard";
 import { ExerciseInfoModal } from "@/components/ExerciseInfoModal";
+import {useFocusEffect} from "@react-navigation/native";
 
 const LoadingState = () => (
     <View style={styles.container}>
@@ -36,7 +37,7 @@ const EmptyState = () => (
 
 export default function AddScreen() {
     const router = useRouter();
-    const { workout: workoutParam, t } = useLocalSearchParams<{ workout?: string; t?: string }>();
+    const { workout: workoutParam } = useLocalSearchParams<{ workout?: string; }>();
 
     // Main state
     const [currentWorkout, setCurrentWorkout] = useState<WorkoutDTO | null>(null);
@@ -80,30 +81,32 @@ export default function AddScreen() {
     };
 
     // Initialize data (exercises to pick from + workout)
-    useEffect(() => {
-        const initializeData = async () => {
-            setLoading(true);
+    useFocusEffect(
+        useCallback(() => {
+            const initializeData = async () => {
+                setLoading(true);
 
-            try {
-                // Load available exercises
-                const allExercises = await loadExercises();
-                setAvailableExercises(allExercises);
+                try {
+                    // Load available exercises
+                    const allExercises = await loadExercises();
+                    setAvailableExercises(allExercises);
 
-                // Load current workout if editing
-                if (workoutParam) {
-                    const parsedWorkout = JSON.parse(decodeURIComponent(workoutParam as string));
-                    setCurrentWorkout(parsedWorkout);
-                    setExercises(parsedWorkout.exercises || []);
+                    // Load current workout if editing
+                    if (workoutParam) {
+                        const parsedWorkout = JSON.parse(decodeURIComponent(workoutParam as string));
+                        setCurrentWorkout(parsedWorkout);
+                        setExercises(parsedWorkout.exercises || []);
+                    }
+                } catch (error) {
+                    console.error('Failed to initialize data:', error);
+                } finally {
+                    setLoading(false);
                 }
-            } catch (error) {
-                console.error('Failed to initialize data:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
+            };
 
-        initializeData();
-    }, [workoutParam, t]);
+            initializeData();
+        }, [workoutParam])
+    );
 
     // Handlers
     const handleSaveWorkout = useCallback(async () => {
