@@ -8,6 +8,7 @@ import type {
     NavigationHelpers,
     ParamListBase
 } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 
 function CustomTabBar({state, navigation}: {
     state: TabNavigationState<ParamListBase>;
@@ -22,10 +23,10 @@ function CustomTabBar({state, navigation}: {
                 <TouchableOpacity
                     style={styles.tabButton}
                     onPress={() => {
-                        DeviceEventEmitter.emit('SAVE-WORKOUT');
+                        DeviceEventEmitter.emit('DELETE-WORKOUT');
                     }}
                 >
-                    <Ionicons name="checkmark-circle-outline" size={24} color="#8E8E93" />
+                    <Ionicons name="trash-outline" size={24} color="#8E8E93" />
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -40,10 +41,10 @@ function CustomTabBar({state, navigation}: {
                 <TouchableOpacity
                     style={styles.tabButton}
                     onPress={() => {
-                        DeviceEventEmitter.emit('DELETE-WORKOUT');
+                        DeviceEventEmitter.emit('SAVE-WORKOUT');
                     }}
                 >
-                    <Ionicons name="trash-outline" size={24} color="#8E8E93" />
+                    <Ionicons name="checkmark-circle-outline" size={24} color="#8E8E93" />
                 </TouchableOpacity>
             </View>
         );
@@ -96,14 +97,17 @@ export default function RootLayout() {
     }, []);
 
     return (
-        <Tabs
-            screenOptions={{ headerShown: false }}
-            tabBar={(props) => <CustomTabBar {...props} />}
-        >
-            <Tabs.Screen name="index" options={{ title: "Home" }} />
-            <Tabs.Screen name="add/index" options={{ title: "Add" }} />
-            <Tabs.Screen name="settings/index" options={{ title: "Settings" }} />
-        </Tabs>
+        <>
+            <Tabs
+                screenOptions={{ headerShown: false }}
+                tabBar={(props) => <CustomTabBar {...props} />}
+            >
+                <Tabs.Screen name="index" options={{ title: "Home" }} />
+                <Tabs.Screen name="add/index" options={{ title: "Add" }} />
+                <Tabs.Screen name="settings/index" options={{ title: "Settings" }} />
+            </Tabs>
+            <Toast />
+        </>
     );
 }
 

@@ -15,11 +15,11 @@ import { MUSCLE_GROUPS } from '@/data/muscleGroups';
 interface ExerciseSearchModalProps {
     visible: boolean;
     availableExercises: Exercise[];
-    onAddExercise: (exercise: Exercise) => void;
+    onSelectExercise: (exercise: Exercise) => void;
     onClose: () => void;
 }
 
-export const ExerciseSearchModal: React.FC<ExerciseSearchModalProps> = ({visible, availableExercises, onAddExercise, onClose}) =>
+export const ExerciseSearchModal: React.FC<ExerciseSearchModalProps> = ({visible, availableExercises, onSelectExercise, onClose}) =>
 {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedMuscle, setSelectedMuscle] = useState<MuscleGroup | null>(null);
@@ -43,7 +43,7 @@ export const ExerciseSearchModal: React.FC<ExerciseSearchModalProps> = ({visible
     };
 
     const handleSelectExercise = (exercise: Exercise) => {
-        onAddExercise(exercise);
+        onSelectExercise(exercise);
         setSearchQuery('');
         setSelectedMuscle(null);
     };

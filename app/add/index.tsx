@@ -370,7 +370,7 @@ export default function AddScreen() {
             <ExerciseSearchModal
                 visible={isExerciseSearchModalVisible}
                 availableExercises={availableExercises}
-                onAddExercise={handleAddExercise}
+                onSelectExercise={handleAddExercise}
                 onClose={() => setIsExerciseSearchModalVisible(false)}
             />
 

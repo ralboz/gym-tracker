@@ -34,6 +34,32 @@ export const createExercise = async (exercise: Omit<Exercise, 'id'>) => {
     await AsyncStorage.setItem(EXERCISES_KEY, JSON.stringify(currentExercises));
 };
 
+export const updateExercise = async (id: number, exerciseData: Omit<Exercise, 'id'>): Promise<void> => {
+    try {
+        const currentExercises = await loadExercises();
+        const updatedExercises = currentExercises.map(ex =>
+            ex.id === id
+                ? { ...ex, ...exerciseData }
+                : ex
+        );
+        await AsyncStorage.setItem(EXERCISES_KEY, JSON.stringify(updatedExercises));
+    } catch (error) {
+        console.error('Failed to update exercise:', error);
+        throw error;
+    }
+};
+
+export const deleteExercise = async (exerciseId: number): Promise<void> => {
+    try {
+        const currentExercises = await loadExercises();
+        const updatedExercises = currentExercises.filter(ex => ex.id !== exerciseId);
+        await AsyncStorage.setItem(EXERCISES_KEY, JSON.stringify(updatedExercises));
+    } catch (error) {
+        console.error('Failed to delete exercise:', error);
+        throw error;
+    }
+};
+
 export const dumpAsyncStorage = async () => {
     const keys = await AsyncStorage.getAllKeys();
     const entries = await AsyncStorage.multiGet(keys);
