@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {exerciseSeedData} from "@/data/data";
 import {Exercise} from "@/data/types";
 
-const EXERCISES_KEY = 'exercises';
+export const EXERCISES_KEY = 'exercises';
 
 export const seedExercisesIfEmpty = async () => {
     const existing = await AsyncStorage.getItem(EXERCISES_KEY);

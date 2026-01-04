@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ExerciseHistory, WorkoutDTO, WorkoutSetDTO} from "@/data/types";
 
-const WORKOUTS_KEY = 'workouts';
+export const WORKOUTS_KEY = 'workouts';
 
 export const loadWorkouts = async (): Promise<WorkoutDTO[]> => {
     const json = await AsyncStorage.getItem(WORKOUTS_KEY);
