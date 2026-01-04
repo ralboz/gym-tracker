@@ -5,7 +5,7 @@ import {ExerciseFormModal} from "@/components/ExerciseFormModal";
 import {ExerciseSearchModal} from "@/components/ExerciseSearchModal";
 import {Exercise} from "@/data/types";
 import {useFocusEffect} from "@react-navigation/native";
-import {loadExercises} from "@/data/dataUtils";
+import {clearAsyncStorage, loadExercises, seedExercisesIfEmpty} from "@/data/dataUtils";
 import { exportData, importData } from "@/data/backup";
 
 export default function SettingsScreen() {
@@ -56,6 +56,40 @@ export default function SettingsScreen() {
         }
     }, [loadAvailableExercises]);
 
+    const handleSeedExercises = useCallback(async () => {
+        const success = await seedExercisesIfEmpty();
+        if(success) {
+            Alert.alert('Success', 'Seeded exercises successfully! App will refresh.');
+            loadAvailableExercises();
+        } else {
+            Alert.alert('Seeding Failed', 'Unable to seed, as u already have exercises.');
+        }
+    }, [loadAvailableExercises]);
+
+    const handleClearData = useCallback(async () => {
+        Alert.alert(
+            `This action cannot be undone`,
+            `Are you sure you want to clear all data?`,
+            [
+                { text: 'No', style: 'cancel' },
+                {
+                    text: `Yes`,
+                    style: 'destructive',
+                    onPress: async () => {
+                        const success = await clearAsyncStorage();
+                        if(success)
+                        {
+                            Alert.alert('Success', 'All data cleared successfully! App will refresh.');
+                            loadAvailableExercises();
+                        } else {
+                            Alert.alert('Failed', 'Unable to clear data.');
+                        }
+                    }
+                }
+            ]
+        );
+    }, [loadAvailableExercises]);
+
     const handleExerciseSelected = useCallback((exercise: Exercise) => {
         setSelectedExercise(exercise);
         setExerciseSearchModalVisible(false);
@@ -78,7 +112,7 @@ export default function SettingsScreen() {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Exercise Management</Text>
+            <Text style={styles.title}>Settings</Text>
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Exercises</Text>
                 <View style={styles.settingsRow}>
@@ -94,10 +128,22 @@ export default function SettingsScreen() {
                         <Text style={styles.buttonText}>Edit</Text>
                     </TouchableOpacity>
                 </View>
+                <View style={styles.settingsRow}>
+                    <TouchableOpacity
+                        onPress={handleSeedExercises}
+                        style={[styles.button]}
+                        disabled={exportLoading}
+                    >
+                        <Ionicons name="chevron-collapse-outline" size={20} color="#FFFFFF"/>
+                        <Text style={styles.buttonText}>
+                            Import Default Exercises
+                        </Text>
+                    </TouchableOpacity>
+                </View>
             </View>
 
             <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Data Backup</Text>
+                <Text style={styles.sectionTitle}>Data Actions</Text>
                 <View style={styles.settingsRow}>
                     <TouchableOpacity
                         onPress={handleExportPress}
@@ -125,6 +171,18 @@ export default function SettingsScreen() {
                         )}
                         <Text style={styles.buttonText}>
                             {importLoading ? 'Importing...' : 'Import Data'}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.settingsRow}>
+                    <TouchableOpacity
+                        onPress={handleClearData}
+                        style={[styles.button]}
+                        disabled={exportLoading}
+                    >
+                        <Ionicons name="trash-outline" size={20} color="#FFFFFF"/>
+                        <Text style={styles.buttonText}>
+                            Clear all data
                         </Text>
                     </TouchableOpacity>
                 </View>

@@ -93,6 +93,10 @@ export const ExerciseSearchModal: React.FC<ExerciseSearchModalProps> = ({visible
                         ))}
                     </ScrollView>
 
+
+                    {filteredExercises.length === 0 &&
+                        (<Text style={{padding: 10, color: "red"}}>No exercises found, please go to settings to add exercises.</Text>)
+                    }
                     {/* FlatList - Takes remaining space */}
                     <FlatList
                         data={filteredExercises}

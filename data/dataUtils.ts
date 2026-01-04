@@ -4,11 +4,16 @@ import {Exercise} from "@/data/types";
 
 export const EXERCISES_KEY = 'exercises';
 
-export const seedExercisesIfEmpty = async () => {
+export const seedExercisesIfEmpty = async (): Promise<boolean> => {
     const existing = await AsyncStorage.getItem(EXERCISES_KEY);
-    if (existing) return;
-
-    await AsyncStorage.setItem(EXERCISES_KEY, JSON.stringify(exerciseSeedData));
+    if (existing) return false;
+    try {
+        await AsyncStorage.setItem(EXERCISES_KEY, JSON.stringify(exerciseSeedData));
+        return true;
+    } catch (error) {
+        console.error('Failed to seed exercises:', error);
+        return false;
+    }
 };
 
 export const loadExercises = async (): Promise<Exercise[]> => {
@@ -66,6 +71,12 @@ export const dumpAsyncStorage = async () => {
     console.log('AsyncStorage dump:', Object.fromEntries(entries));
 };
 
-export const clearAsyncStorage = async () => {
-    await AsyncStorage.clear()
+export const clearAsyncStorage = async (): Promise<boolean> => {
+    try{
+        await AsyncStorage.clear();
+        return true;
+    } catch(error) {
+        console.error('Failed to clear storage:', error);
+        return false;
+    }
 };

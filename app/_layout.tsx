@@ -1,8 +1,7 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { View, TouchableOpacity, StyleSheet, DeviceEventEmitter } from 'react-native';
-import {clearAsyncStorage, dumpAsyncStorage, seedExercisesIfEmpty} from "@/data/dataUtils";
-import {ComponentProps, useEffect} from "react";
+import {ComponentProps} from "react";
 import type {
     TabNavigationState,
     NavigationHelpers,
@@ -89,13 +88,6 @@ function CustomTabBar({state, navigation}: {
 }
 
 export default function RootLayout() {
-
-    useEffect(() => {
-        // clearAsyncStorage();
-        seedExercisesIfEmpty().catch(console.error);
-        // dumpAsyncStorage();
-    }, []);
-
     return (
         <>
             <Tabs
