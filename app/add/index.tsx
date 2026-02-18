@@ -1,23 +1,23 @@
-import React, {useState, useCallback, useEffect} from "react";
+import { ExerciseCard } from "@/components/ExerciseCard";
+import { ExerciseInfoModal } from "@/components/ExerciseInfoModal";
+import { ExerciseSearchModal } from "@/components/ExerciseSearchModal";
+import { NotesModal } from "@/components/NotesModal";
+import { NumberWheelModal } from "@/components/NumberWheelModal";
+import { loadExercises } from "@/data/dataUtils";
+import { Exercise, WorkoutDTO, WorkoutExerciseDTO, WorkoutSetDTO } from "@/data/types";
+import { deleteWorkout, saveNewWorkout, updateWorkout } from "@/data/workoutsUtils";
+import { useFocusEffect } from "@react-navigation/native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
 import {
-    StyleSheet,
-    View,
-    Text,
     ActivityIndicator,
+    Alert,
     DeviceEventEmitter,
     ScrollView,
-    Alert
+    StyleSheet,
+    Text,
+    View
 } from "react-native";
-import {Exercise, WorkoutDTO, WorkoutExerciseDTO, WorkoutSetDTO} from "@/data/types";
-import {useLocalSearchParams, useRouter} from "expo-router";
-import {deleteWorkout, saveNewWorkout, updateWorkout} from "@/data/workoutsUtils";
-import {loadExercises} from "@/data/dataUtils";
-import { NumberWheelModal } from "@/components/NumberWheelModal";
-import { NotesModal } from "@/components/NotesModal";
-import { ExerciseSearchModal } from "@/components/ExerciseSearchModal";
-import {ExerciseCard} from "@/components/ExerciseCard";
-import { ExerciseInfoModal } from "@/components/ExerciseInfoModal";
-import {useFocusEffect} from "@react-navigation/native";
 
 const LoadingState = () => (
     <View style={styles.container}>
@@ -214,6 +214,21 @@ export default function AddScreen() {
         );
     }, []);
 
+    const handleDuplicateSet = useCallback((exerciseId: number, set: WorkoutSetDTO) => {
+        const newSet: WorkoutSetDTO = {
+            id: Date.now(),
+            weight: set.weight,
+            reps: set.reps,
+        };
+        setExercises(prev =>
+            prev.map(exercise =>
+                exercise.id === exerciseId
+                    ? { ...exercise, sets: [...exercise.sets, newSet] }
+                    : exercise
+            )
+        );
+    }, []);
+
     const handleOpenNumberWheel = useCallback((
         workoutExercise: WorkoutExerciseDTO,
         workoutSet: WorkoutSetDTO,
@@ -304,6 +319,38 @@ export default function AddScreen() {
         setIsInfoModalVisible(true);
     }, []);
 
+    const handleDuplicateExerciseSets = useCallback((exerciseId: number, sets: WorkoutSetDTO[]) => {
+        const applyDuplicate = () => {
+            const newSets: WorkoutSetDTO[] = sets.map(set => ({
+                id: Date.now() + Math.random(),
+                weight: set.weight,
+                reps: set.reps,
+            }));
+            setExercises(prev =>
+                prev.map(exercise =>
+                    exercise.id === exerciseId
+                        ? { ...exercise, sets: newSets }
+                        : exercise
+                )
+            );
+            setIsInfoModalVisible(false);
+        };
+
+        const currentExercise = exercises.find(ex => ex.id === exerciseId);
+        if (currentExercise && currentExercise.sets.length > 0) {
+            Alert.alert(
+                'Overwrite Sets',
+                'This exercise already has sets. Duplicating will replace them. Continue?',
+                [
+                    { text: 'Cancel', style: 'cancel' },
+                    { text: 'Overwrite', style: 'destructive', onPress: applyDuplicate },
+                ]
+            );
+        } else {
+            applyDuplicate();
+        }
+    }, [exercises]);
+
     // DeviceEventEmitter listeners
     useEffect(() => {
         const handleAddExercise = () => setIsExerciseSearchModalVisible(true);
@@ -342,6 +389,7 @@ export default function AddScreen() {
                             onDeleteExercise={handleDeleteExercise}
                             onAddSet={handleAddSet}
                             onDeleteSet={handleDeleteSet}
+                            onDuplicateSet={handleDuplicateSet}
                             onEditSet={handleOpenNumberWheel}
                             onShowNotes={handleShowNoteInput}
                             onShowExerciseInfo={handleShowExerciseInfo}
@@ -378,6 +426,7 @@ export default function AddScreen() {
                 visible={isInfoModalVisible}
                 exercise={selectedExercise}
                 onClose={() => setIsInfoModalVisible(false)}
+                onDuplicateExerciseSets={handleDuplicateExerciseSets}
             />
 
         </View>

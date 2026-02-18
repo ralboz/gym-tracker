@@ -1,5 +1,5 @@
+import { ExerciseHistory, WorkoutDTO, WorkoutSetDTO } from "@/data/types";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {ExerciseHistory, WorkoutDTO, WorkoutSetDTO} from "@/data/types";
 
 export const WORKOUTS_KEY = 'workouts';
 
@@ -57,7 +57,7 @@ export const getExerciseHistory = async (exerciseId: number): Promise<ExerciseHi
         .filter(w => w.exercises.some(e => e.id === exerciseId))
         .sort((a, b) => b.created_date - a.created_date);
 
-    const recentWorkouts = relevantWorkouts.slice(0, 4);
+    const recentWorkouts = relevantWorkouts.slice(0, 10);
 
     // Find PR set across all workouts
     let prSet: WorkoutSetDTO | null = null;

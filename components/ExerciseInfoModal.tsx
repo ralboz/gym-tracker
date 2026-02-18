@@ -1,24 +1,25 @@
+import { Exercise, ExerciseHistory, WorkoutSetDTO } from "@/data/types";
+import { getExerciseHistory } from "@/data/workoutsUtils";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useEffect, useState } from "react";
 import {
+    ActivityIndicator,
     Modal,
+    ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
-    View,
-    ScrollView,
-    ActivityIndicator
+    View
 } from "react-native";
-import React, {useEffect, useState} from "react";
-import {getExerciseHistory} from "@/data/workoutsUtils";
-import {ExerciseHistory, Exercise} from "@/data/types";
-import {Ionicons} from "@expo/vector-icons";
 
 interface ExerciseInfoModalProps {
     visible: boolean;
     exercise: Exercise | null;
     onClose: () => void;
+    onDuplicateExerciseSets?: (exerciseId: number, sets: WorkoutSetDTO[]) => void;
 }
 
-export const ExerciseInfoModal: React.FC<ExerciseInfoModalProps> = ({visible, exercise, onClose}) => {
+export const ExerciseInfoModal: React.FC<ExerciseInfoModalProps> = ({visible, exercise, onClose, onDuplicateExerciseSets}) => {
     const [history, setHistory] = useState<ExerciseHistory | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -122,9 +123,19 @@ export const ExerciseInfoModal: React.FC<ExerciseInfoModalProps> = ({visible, ex
                                                     <Text style={styles.workoutDate}>
                                                         {formatDate(workout.created_date)}
                                                     </Text>
-                                                    <Text style={styles.workoutVolume}>
-                                                        {totalVolume.toFixed(0)} kg total
-                                                    </Text>
+                                                    <View style={styles.workoutHeaderRight}>
+                                                        <Text style={styles.workoutVolume}>
+                                                            {totalVolume.toFixed(0)} kg total
+                                                        </Text>
+                                                        {onDuplicateExerciseSets && (
+                                                            <TouchableOpacity
+                                                                onPress={() => onDuplicateExerciseSets(exercise!.id, exerciseInstance.sets)}
+                                                                style={styles.duplicateWorkoutBtn}
+                                                            >
+                                                                <Ionicons name="copy-outline" size={18} color="#007AFF" />
+                                                            </TouchableOpacity>
+                                                        )}
+                                                    </View>
                                                 </View>
 
                                                 <View style={styles.setsGrid}>
@@ -266,6 +277,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 12,
     },
+    workoutHeaderRight: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+    },
     workoutDate: {
         fontSize: 16,
         fontWeight: '600',
@@ -314,5 +330,10 @@ const styles = StyleSheet.create({
         color: '#999',
         textAlign: 'center',
         paddingVertical: 40,
+    },
+    duplicateWorkoutBtn: {
+        backgroundColor: '#E8F0FE',
+        padding: 6,
+        borderRadius: 6,
     },
 });
