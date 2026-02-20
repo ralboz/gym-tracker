@@ -1,3 +1,6 @@
+import { migrateMuscleGroups } from '@/data/dataUtils';
+import { ThemeProvider } from '@/theme/ThemeProvider';
+import { useTheme } from '@/theme/useTheme';
 import { Ionicons } from '@expo/vector-icons';
 import type {
     NavigationHelpers,
@@ -6,11 +9,9 @@ import type {
 } from '@react-navigation/native';
 import { Tabs } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ComponentProps } from 'react';
+import { ComponentProps, useEffect } from 'react';
 import { DeviceEventEmitter, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { ThemeProvider } from '@/theme/ThemeProvider';
-import { useTheme } from '@/theme/useTheme';
 
 function CustomTabBar({state, navigation}: {
     state: TabNavigationState<ParamListBase>;
@@ -109,6 +110,10 @@ function InnerLayout() {
 }
 
 export default function RootLayout() {
+    useEffect(() => {
+        migrateMuscleGroups();
+    }, []);
+
     return (
         <ThemeProvider>
             <InnerLayout />

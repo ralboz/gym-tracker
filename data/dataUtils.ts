@@ -1,6 +1,6 @@
+import { exerciseSeedData } from "@/data/data";
+import { Exercise } from "@/data/types";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {exerciseSeedData} from "@/data/data";
-import {Exercise} from "@/data/types";
 
 export const EXERCISES_KEY = 'exercises';
 
@@ -78,5 +78,58 @@ export const clearAsyncStorage = async (): Promise<boolean> => {
     } catch(error) {
         console.error('Failed to clear storage:', error);
         return false;
+    }
+};
+
+const MIGRATION_KEY = 'muscle_group_migration_v1';
+
+const MUSCLE_GROUP_REMAP: Record<string, string> = {
+    'obliques': 'abs',
+    'hip_flexors': 'abs',
+    'core': 'abs',
+    'posterior_chain': 'back',
+    'full_body': 'full body',
+    'rear_delts': 'rear delts',
+};
+
+const remapMuscleGroup = (group: string | null): string | null => {
+    if (!group) return null;
+    return MUSCLE_GROUP_REMAP[group] ?? group;
+};
+
+// migration script due to change of muscle groups
+export const migrateMuscleGroups = async (): Promise<void> => {
+    const alreadyRun = await AsyncStorage.getItem(MIGRATION_KEY);
+    if (alreadyRun) return;
+
+    try {
+        const exercisesJson = await AsyncStorage.getItem(EXERCISES_KEY);
+        if (exercisesJson) {
+            const exercises = JSON.parse(exercisesJson);
+            const migrated = exercises.map((ex: any) => ({
+                ...ex,
+                primary_muscle_group_id: remapMuscleGroup(ex.primary_muscle_group_id) ?? ex.primary_muscle_group_id,
+                secondary_muscle_group_id: remapMuscleGroup(ex.secondary_muscle_group_id),
+            }));
+            await AsyncStorage.setItem(EXERCISES_KEY, JSON.stringify(migrated));
+        }
+
+        const workoutsJson = await AsyncStorage.getItem('workouts');
+        if (workoutsJson) {
+            const workouts = JSON.parse(workoutsJson);
+            const migrated = workouts.map((w: any) => ({
+                ...w,
+                exercises: w.exercises.map((ex: any) => ({
+                    ...ex,
+                    primary_muscle_group_id: remapMuscleGroup(ex.primary_muscle_group_id) ?? ex.primary_muscle_group_id,
+                    secondary_muscle_group_id: remapMuscleGroup(ex.secondary_muscle_group_id),
+                })),
+            }));
+            await AsyncStorage.setItem('workouts', JSON.stringify(migrated));
+        }
+
+        await AsyncStorage.setItem(MIGRATION_KEY, 'true');
+    } catch (error) {
+        console.error('Muscle group migration failed:', error);
     }
 };

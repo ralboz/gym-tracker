@@ -1,9 +1,8 @@
 export type MuscleGroup =
-    | 'chest' | 'back' | 'shoulders' | 'rear_delts' | 'traps'
+    | 'chest' | 'back' | 'shoulders' | 'rear delts' | 'traps'
     | 'biceps' | 'triceps' | 'forearms'
     | 'quads' | 'hamstrings' | 'glutes' | 'calves'
-    | 'abs' | 'obliques' | 'hip_flexors' | 'core'
-    | 'posterior_chain' | 'full_body';
+    | 'abs' | 'full body';
 
 export interface Exercise {
   id: number;

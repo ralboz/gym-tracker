@@ -1,11 +1,10 @@
 import { MuscleGroup } from './types';
 
 export const MUSCLE_GROUPS: MuscleGroup[] = [
-    'chest', 'back', 'shoulders', 'rear_delts', 'traps',
+    'chest', 'back', 'shoulders', 'rear delts', 'traps',
     'biceps', 'triceps', 'forearms',
     'quads', 'hamstrings', 'glutes', 'calves',
-    'abs', 'obliques', 'hip_flexors', 'core',
-    'posterior_chain', 'full_body'
+    'abs', 'full body'
 ] as const;
 
 export const getMuscleGroupOptions = () => MUSCLE_GROUPS.map(group => ({
