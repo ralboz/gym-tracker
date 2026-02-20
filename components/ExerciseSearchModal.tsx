@@ -12,6 +12,7 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
+import { useTheme } from "@/theme/useTheme";
 
 interface ExerciseSearchModalProps {
     visible: boolean;
@@ -23,6 +24,7 @@ interface ExerciseSearchModalProps {
 
 export const ExerciseSearchModal: React.FC<ExerciseSearchModalProps> = ({visible, availableExercises, onSelectExercise, onClose, onCreateExercise}) =>
 {
+    const { colors } = useTheme();
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedMuscle, setSelectedMuscle] = useState<MuscleGroup | null>(null);
 
@@ -52,12 +54,13 @@ export const ExerciseSearchModal: React.FC<ExerciseSearchModalProps> = ({visible
 
     return (
         <Modal visible={visible} animationType="slide" transparent>
-            <View style={styles.modalOverlay}>
-                <View style={styles.modalContent}>
-                    <View style={styles.searchRow}>
+            <View style={[styles.modalOverlay, { backgroundColor: colors.overlay }]}>
+                <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+                    <View style={[styles.searchRow, { borderBottomColor: colors.border, backgroundColor: colors.surface }]}>
                         <TextInput
-                            style={[styles.searchInput, { flex: 1 }]}
+                            style={[styles.searchInput, { flex: 1, color: colors.textPrimary }]}
                             placeholder="Search exercises..."
+                            placeholderTextColor={colors.textMuted}
                             value={searchQuery}
                             onChangeText={setSearchQuery}
                             autoFocus
@@ -68,7 +71,7 @@ export const ExerciseSearchModal: React.FC<ExerciseSearchModalProps> = ({visible
                                 style={styles.createButton}
                                 testID="create-exercise-button"
                             >
-                                <Ionicons name="add-circle-outline" size={28} color="#007AFF" />
+                                <Ionicons name="add-circle-outline" size={28} color={colors.primaryAction} />
                             </TouchableOpacity>
                         )}
                     </View>
@@ -84,10 +87,11 @@ export const ExerciseSearchModal: React.FC<ExerciseSearchModalProps> = ({visible
                             onPress={() => setSelectedMuscle(null)}
                             style={[
                                 styles.muscleChip,
-                                !selectedMuscle && styles.muscleChipActive,
+                                { borderColor: colors.border },
+                                !selectedMuscle && { backgroundColor: colors.primaryAction, borderColor: colors.primaryAction },
                             ]}
                         >
-                            <Text style={!selectedMuscle ? {color: 'white'} : {}}>All</Text>
+                            <Text style={!selectedMuscle ? {color: 'white'} : {color: colors.textPrimary}}>All</Text>
                         </TouchableOpacity>
                         {MUSCLE_GROUPS.map(group => (
                             <TouchableOpacity
@@ -95,10 +99,11 @@ export const ExerciseSearchModal: React.FC<ExerciseSearchModalProps> = ({visible
                                 onPress={() => setSelectedMuscle(selectedMuscle === group ? null : group)}
                                 style={[
                                     styles.muscleChip,
-                                    selectedMuscle === group && styles.muscleChipActive,
+                                    { borderColor: colors.border },
+                                    selectedMuscle === group && { backgroundColor: colors.primaryAction, borderColor: colors.primaryAction },
                                 ]}
                             >
-                                <Text style={selectedMuscle === group ? {color: 'white'} : {}}>
+                                <Text style={selectedMuscle === group ? {color: 'white'} : {color: colors.textPrimary}}>
                                     {group}
                                 </Text>
                             </TouchableOpacity>
@@ -107,7 +112,7 @@ export const ExerciseSearchModal: React.FC<ExerciseSearchModalProps> = ({visible
 
 
                     {filteredExercises.length === 0 &&
-                        (<Text style={{padding: 10, color: "red"}}>No exercises found, please go to settings to add exercises.</Text>)
+                        (<Text style={{padding: 10, color: colors.destructiveAction}}>No exercises found, please go to settings to add exercises.</Text>)
                     }
                     {/* FlatList - Takes remaining space */}
                     <FlatList
@@ -115,10 +120,10 @@ export const ExerciseSearchModal: React.FC<ExerciseSearchModalProps> = ({visible
                         keyExtractor={item => item.id.toString()}
                         renderItem={({item}) => (
                             <TouchableOpacity
-                                style={styles.exerciseItem}
+                                style={[styles.exerciseItem, { borderBottomColor: colors.border }]}
                                 onPress={() => handleSelectExercise(item)}
                             >
-                                <Text style={styles.exerciseListItemName}>{item.name}</Text>
+                                <Text style={[styles.exerciseListItemName, { color: colors.textPrimary }]}>{item.name}</Text>
                             </TouchableOpacity>
                         )}
                         style={{flex: 1}}
@@ -128,7 +133,7 @@ export const ExerciseSearchModal: React.FC<ExerciseSearchModalProps> = ({visible
                     {/* Close Button - Fixed */}
                     <TouchableOpacity
                         onPress={handleClose}
-                        style={styles.closeButton}
+                        style={[styles.closeButton, { backgroundColor: colors.destructiveAction }]}
                     >
                         <Text style={{color: 'white', fontWeight: '600'}}>Close</Text>
                     </TouchableOpacity>
@@ -141,12 +146,10 @@ export const ExerciseSearchModal: React.FC<ExerciseSearchModalProps> = ({visible
 const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
         justifyContent: 'center',
         alignItems: 'center',
     },
     modalContent: {
-        backgroundColor: 'white',
         borderRadius: 16,
         width: '90%',
         height: '80%',
@@ -161,8 +164,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderBottomWidth: 1,
-        borderBottomColor: '#E0E0E0',
-        backgroundColor: '#F8F9FA',
     },
     searchInput: {
         paddingVertical: 16,
@@ -185,20 +186,14 @@ const styles = StyleSheet.create({
         paddingVertical: 4,
         borderRadius: 16,
         borderWidth: 1,
-        borderColor: '#ccc',
         height: 40,
         alignItems: 'center',
         justifyContent: 'center',
-    },
-    muscleChipActive: {
-        backgroundColor: '#007AFF',
-        borderColor: '#007AFF',
     },
     exerciseItem: {
         paddingHorizontal: 20,
         paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#F0F0F0',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -209,7 +204,6 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     closeButton: {
-        backgroundColor: '#FF3B30',
         paddingVertical: 16,
         paddingHorizontal: 20,
         borderRadius: 8,

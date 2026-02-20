@@ -1,6 +1,7 @@
-import {Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import NumberWheel from "@/components/NumberWheel";
 import React from "react";
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useTheme } from "@/theme/useTheme";
 
 interface NumberWheelModalProps {
     visible: boolean;
@@ -12,12 +13,14 @@ interface NumberWheelModalProps {
 
 export const NumberWheelModal: React.FC<NumberWheelModalProps> = ({visible, value, field, onValueChange, onSave}) =>
 {
+    const { colors } = useTheme();
+
     return (
         <Modal visible={visible} animationType="slide" transparent>
-            <View style={styles.modalOverlay}>
-                <View style={styles.numberWheelModal}>
+            <View style={[styles.modalOverlay, { backgroundColor: colors.overlay }]}>
+                <View style={[styles.numberWheelModal, { backgroundColor: colors.card }]}>
                     <View style={styles.wheelHeader}>
-                        <Text style={styles.wheelHeaderText}>
+                        <Text style={[styles.wheelHeaderText, { color: colors.textPrimary }]}>
                             {field === 'weight' ? 'Set Weight (kg)' : 'Set Reps'}
                         </Text>
                     </View>
@@ -29,7 +32,7 @@ export const NumberWheelModal: React.FC<NumberWheelModalProps> = ({visible, valu
                         step={1}
                         onValueChange={onValueChange}
                     />
-                    <TouchableOpacity onPress={onSave} style={styles.saveButton}>
+                    <TouchableOpacity onPress={onSave} style={[styles.saveButton, { backgroundColor: colors.primaryAction }]}>
                         <Text style={{color: 'white', fontWeight: '600'}}>Save</Text>
                     </TouchableOpacity>
                 </View>
@@ -41,12 +44,10 @@ export const NumberWheelModal: React.FC<NumberWheelModalProps> = ({visible, valu
 const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
         justifyContent: 'center',
         alignItems: 'center',
     },
     numberWheelModal: {
-        backgroundColor: 'white',
         borderRadius: 16,
         width: '90%',
         padding: 20,
@@ -63,10 +64,8 @@ const styles = StyleSheet.create({
     wheelHeaderText: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#333',
     },
     saveButton: {
-        backgroundColor: '#007AFF',
         paddingVertical: 16,
         paddingHorizontal: 20,
         borderRadius: 8,

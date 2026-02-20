@@ -19,26 +19,29 @@ import {
     Text,
     View
 } from "react-native";
+import { ColorTokens } from "@/theme/theme";
+import { useTheme } from "@/theme/useTheme";
 
-const LoadingState = () => (
-    <View style={styles.container}>
+const LoadingState = ({ colors }: { colors: ColorTokens }) => (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.loadingState}>
-            <ActivityIndicator size="large" color="#007AFF"/>
-            <Text style={{marginTop: 12}}>Loading workout...</Text>
+            <ActivityIndicator size="large" color={colors.primaryAction}/>
+            <Text style={{marginTop: 12, color: colors.textPrimary}}>Loading workout...</Text>
         </View>
     </View>
 );
 
-const EmptyState = () => (
+const EmptyState = ({ colors }: { colors: ColorTokens }) => (
     <View style={styles.emptyState}>
-        <Text style={{fontSize: 18, marginBottom: 8}}>No exercises added yet</Text>
-        <Text style={{color: '#666'}}>Tap + to add exercises</Text>
+        <Text style={{fontSize: 18, marginBottom: 8, color: colors.textPrimary}}>No exercises added yet</Text>
+        <Text style={{color: colors.textMuted}}>Tap + to add exercises</Text>
     </View>
 );
 
 export default function AddScreen() {
     const router = useRouter();
     const { workoutId: workoutIdParam } = useLocalSearchParams<{ workoutId?: string; }>();
+    const { colors } = useTheme();
 
     // Main state
     const [currentWorkout, setCurrentWorkout] = useState<WorkoutDTO | null>(null);
@@ -390,14 +393,14 @@ export default function AddScreen() {
 
     if (loading) {
         return (
-            <LoadingState />
+            <LoadingState colors={colors} />
         );
     }
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             {exercises.length === 0 ? (
-                <EmptyState />
+                <EmptyState colors={colors} />
             ) : (
                 <ScrollView
                     style={{flex: 1}}
@@ -468,7 +471,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 10,
         gap: 10,
-        marginTop: 60,
+        paddingTop: 60,
     },
     loadingState: {
         flex: 1,

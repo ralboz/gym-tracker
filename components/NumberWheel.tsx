@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import WheelPickerExpo from 'react-native-wheel-picker-expo';
+import { useTheme } from '@/theme/useTheme';
 
 interface NumberWheelProps {
     initialValue?: number;
@@ -21,6 +22,8 @@ const NumberWheel: React.FC<NumberWheelProps> = ({
         step = 1,
         label = '',
     }) => {
+    const { colors } = useTheme();
+
     const numbers = React.useMemo(() => {
         return Array.from(
             { length: Math.floor((max - min) / step) + 2 },
@@ -36,14 +39,15 @@ const NumberWheel: React.FC<NumberWheelProps> = ({
     );
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.label}>{label}</Text>
+        <View style={[styles.container, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.label, { color: colors.textPrimary }]}>{label}</Text>
             <WheelPickerExpo
                 height={300}
                 width={150}
                 initialSelectedIndex={selectedIndex >= 0 ? selectedIndex : 0}
                 items={numbers}
-                selectedStyle={{ borderColor: '#007AFF', borderWidth: 1 }}
+                backgroundColor={colors.surface}
+                selectedStyle={{ borderColor: colors.primaryAction, borderWidth: 1 }}
                 onChange={({ item }) => {
                     const newValue = item.value as number;
                     onValueChange?.(newValue);
@@ -58,7 +62,6 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         padding: 20,
-        backgroundColor: '#f8f9fa',
         borderRadius: 16,
         marginVertical: 8,
         shadowColor: '#000',
@@ -70,7 +73,6 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#333',
         marginBottom: 12,
         textTransform: 'uppercase',
         letterSpacing: 0.5,
@@ -79,29 +81,23 @@ const styles = StyleSheet.create({
         height: 50,
         width: 120,
         borderRadius: 12,
-        backgroundColor: '#fff',
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 2,
-        borderColor: '#e3f2fd',
         marginBottom: 8,
     },
     value: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#1976d2',
     },
     input: {
         height: 50,
         width: 120,
         borderRadius: 12,
-        backgroundColor: '#fff',
         textAlign: 'center',
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#1976d2',
         borderWidth: 2,
-        borderColor: '#bbdefb',
         paddingHorizontal: 16,
     },
 });

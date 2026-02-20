@@ -1,14 +1,16 @@
-import React, {useCallback, useState} from "react";
-import {View, StyleSheet, Text, TouchableOpacity, ActivityIndicator, Alert} from "react-native";
-import {Ionicons} from "@expo/vector-icons";
-import {ExerciseFormModal} from "@/components/ExerciseFormModal";
-import {ExerciseSearchModal} from "@/components/ExerciseSearchModal";
-import {Exercise} from "@/data/types";
-import {useFocusEffect} from "@react-navigation/native";
-import {clearAsyncStorage, loadExercises, seedExercisesIfEmpty} from "@/data/dataUtils";
+import { ExerciseFormModal } from "@/components/ExerciseFormModal";
+import { ExerciseSearchModal } from "@/components/ExerciseSearchModal";
 import { exportData, importData } from "@/data/backup";
+import { clearAsyncStorage, loadExercises, seedExercisesIfEmpty } from "@/data/dataUtils";
+import { Exercise } from "@/data/types";
+import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
+import React, { useCallback, useState } from "react";
+import { ActivityIndicator, Alert, StyleSheet, Switch, Text, TouchableOpacity, View } from "react-native";
+import { useTheme } from "@/theme/useTheme";
 
 export default function SettingsScreen() {
+    const { colors, mode, toggleTheme } = useTheme();
     const [exerciseFormVisible, setExerciseFormVisible] = useState(false);
     const [exerciseSearchModalVisible, setExerciseSearchModalVisible] = useState(false);
     const [availableExercises, setAvailableExercises] = useState<Exercise[]>([]);
@@ -111,18 +113,32 @@ export default function SettingsScreen() {
     }, [loadAvailableExercises]);
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Settings</Text>
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Exercises</Text>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <Text style={[styles.title, { color: colors.textPrimary }]}>Settings</Text>
+
+            <View style={[styles.section, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Appearance</Text>
+                <View style={styles.appearanceRow}>
+                    <Text style={[styles.appearanceLabel, { color: colors.textSecondary }]}>Dark Mode</Text>
+                    <Switch
+                        value={mode === 'dark'}
+                        onValueChange={toggleTheme}
+                        trackColor={{ false: colors.border, true: colors.primaryAction }}
+                        thumbColor="#FFFFFF"
+                    />
+                </View>
+            </View>
+
+            <View style={[styles.section, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Exercises</Text>
                 <View style={styles.settingsRow}>
-                    <TouchableOpacity onPress={handleAddNewExercise} style={styles.button}>
+                    <TouchableOpacity onPress={handleAddNewExercise} style={[styles.button, { backgroundColor: colors.primaryAction }]}>
                         <Ionicons name="add-outline" size={20} color="#FFFFFF"/>
                         <Text style={styles.buttonText}>Add</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                         onPress={() => setExerciseSearchModalVisible(true)}
-                        style={styles.button}
+                        style={[styles.button, { backgroundColor: colors.primaryAction }]}
                     >
                         <Ionicons name="create-outline" size={20} color="#FFFFFF"/>
                         <Text style={styles.buttonText}>Edit</Text>
@@ -131,7 +147,7 @@ export default function SettingsScreen() {
                 <View style={styles.settingsRow}>
                     <TouchableOpacity
                         onPress={handleSeedExercises}
-                        style={[styles.button]}
+                        style={[styles.button, { backgroundColor: colors.primaryAction }]}
                         disabled={exportLoading}
                     >
                         <Ionicons name="chevron-collapse-outline" size={20} color="#FFFFFF"/>
@@ -142,12 +158,12 @@ export default function SettingsScreen() {
                 </View>
             </View>
 
-            <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Data Actions</Text>
+            <View style={[styles.section, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Data Actions</Text>
                 <View style={styles.settingsRow}>
                     <TouchableOpacity
                         onPress={handleExportPress}
-                        style={[styles.button, exportLoading && styles.buttonDisabled]}
+                        style={[styles.button, { backgroundColor: colors.primaryAction }, exportLoading && styles.buttonDisabled]}
                         disabled={exportLoading}
                     >
                         {exportLoading ? (
@@ -161,7 +177,7 @@ export default function SettingsScreen() {
                     </TouchableOpacity>
                     <TouchableOpacity
                         onPress={handleImportPress}
-                        style={[styles.button, importLoading && styles.buttonDisabled]}
+                        style={[styles.button, { backgroundColor: colors.primaryAction }, importLoading && styles.buttonDisabled]}
                         disabled={importLoading}
                     >
                         {importLoading ? (
@@ -177,7 +193,7 @@ export default function SettingsScreen() {
                 <View style={styles.settingsRow}>
                     <TouchableOpacity
                         onPress={handleClearData}
-                        style={[styles.button]}
+                        style={[styles.button, { backgroundColor: colors.primaryAction }]}
                         disabled={exportLoading}
                     >
                         <Ionicons name="trash-outline" size={20} color="#FFFFFF"/>
@@ -209,28 +225,33 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
         gap: 20,
-        marginTop: 60,
-        backgroundColor: '#fff'
+        paddingTop: 60,
     },
     title: {
         fontSize: 24,
         fontWeight: '700',
-        color: '#111827'
     },
     section: {
-        backgroundColor: '#f9fafb',
         padding: 16,
         borderRadius: 12,
-        gap: 12
+        gap: 12,
     },
     sectionTitle: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#111827'
+    },
+    appearanceRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    appearanceLabel: {
+        fontSize: 16,
+        fontWeight: '500',
     },
     settingsRow: {
         flexDirection: 'row',
-        gap: 12
+        gap: 12,
     },
     button: {
         flex: 1,
@@ -240,19 +261,17 @@ const styles = StyleSheet.create({
         gap: 8,
         paddingVertical: 12,
         borderRadius: 8,
-        backgroundColor: '#007AFF'
     },
     buttonDisabled: {
-        backgroundColor: '#92C5F6'
+        opacity: 0.5,
     },
     buttonText: {
         color: '#FFFFFF',
         fontWeight: '600',
-        fontSize: 16
+        fontSize: 16,
     },
     loadingOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
         justifyContent: 'center',
         alignItems: 'center',
     },

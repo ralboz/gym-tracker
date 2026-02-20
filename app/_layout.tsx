@@ -1,31 +1,35 @@
-import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { View, TouchableOpacity, StyleSheet, DeviceEventEmitter } from 'react-native';
-import {ComponentProps} from "react";
 import type {
-    TabNavigationState,
     NavigationHelpers,
-    ParamListBase
+    ParamListBase,
+    TabNavigationState
 } from '@react-navigation/native';
+import { Tabs } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { ComponentProps } from 'react';
+import { DeviceEventEmitter, StyleSheet, TouchableOpacity, View } from 'react-native';
 import Toast from 'react-native-toast-message';
+import { ThemeProvider } from '@/theme/ThemeProvider';
+import { useTheme } from '@/theme/useTheme';
 
 function CustomTabBar({state, navigation}: {
     state: TabNavigationState<ParamListBase>;
     navigation: NavigationHelpers<ParamListBase>;
-}) {    const currentRoute = state.routes[state.index];
+}) {
+    const { colors } = useTheme();
+    const currentRoute = state.routes[state.index];
     const isAddScreen = currentRoute.name === 'add/index';
 
     if (isAddScreen) {
-        // Special navigation bar
         return (
-            <View style={styles.tabBar}>
+            <View style={[styles.tabBar, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
                 <TouchableOpacity
                     style={styles.tabButton}
                     onPress={() => {
                         DeviceEventEmitter.emit('DELETE-WORKOUT');
                     }}
                 >
-                    <Ionicons name="trash-outline" size={24} color="#8E8E93" />
+                    <Ionicons name="trash-outline" size={24} color={colors.iconDefault} />
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -34,7 +38,7 @@ function CustomTabBar({state, navigation}: {
                         DeviceEventEmitter.emit('ADD-EXERCISE');
                     }}
                 >
-                    <Ionicons name="add-circle-outline" size={24} color="#8E8E93" />
+                    <Ionicons name="add-circle-outline" size={24} color={colors.iconDefault} />
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -43,7 +47,7 @@ function CustomTabBar({state, navigation}: {
                         DeviceEventEmitter.emit('SAVE-WORKOUT');
                     }}
                 >
-                    <Ionicons name="checkmark-circle-outline" size={24} color="#8E8E93" />
+                    <Ionicons name="checkmark-circle-outline" size={24} color={colors.iconDefault} />
                 </TouchableOpacity>
             </View>
         );
@@ -59,12 +63,10 @@ function CustomTabBar({state, navigation}: {
 
     // Default navigation bar
     return (
-        <View style={styles.tabBar}>
+        <View style={[styles.tabBar, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
             {state.routes.map((route: { name: string; key: string }, index: number) => {
                 const isFocused = state.index === index;
-
                 const iconName = tabIcons[route.name] ?? 'question-circle-outline';
-
                 const onPress = () => {
                     navigation.navigate(route.name);
                 };
@@ -78,7 +80,7 @@ function CustomTabBar({state, navigation}: {
                         <Ionicons
                             name={iconName}
                             size={24}
-                            color={isFocused ? '#007AFF' : '#8E8E93'}
+                            color={isFocused ? colors.iconActive : colors.iconDefault}
                         />
                     </TouchableOpacity>
                 );
@@ -87,9 +89,12 @@ function CustomTabBar({state, navigation}: {
     );
 }
 
-export default function RootLayout() {
+function InnerLayout() {
+    const { mode } = useTheme();
+
     return (
         <>
+            <StatusBar style={mode === 'light' ? 'dark' : 'light'} />
             <Tabs
                 screenOptions={{ headerShown: false }}
                 tabBar={(props) => <CustomTabBar {...props} />}
@@ -103,12 +108,18 @@ export default function RootLayout() {
     );
 }
 
+export default function RootLayout() {
+    return (
+        <ThemeProvider>
+            <InnerLayout />
+        </ThemeProvider>
+    );
+}
+
 const styles = StyleSheet.create({
     tabBar: {
         flexDirection: 'row',
-        backgroundColor: '#fff',
         borderTopWidth: 1,
-        borderTopColor: '#eee',
         height: 60,
     },
     tabButton: {

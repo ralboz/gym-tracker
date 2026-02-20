@@ -1,5 +1,6 @@
-import {Modal, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
 import React from "react";
+import { Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { useTheme } from "@/theme/useTheme";
 
 interface NotesModalProps {
     visible: boolean;
@@ -10,31 +11,34 @@ interface NotesModalProps {
 }
 
 export const NotesModal: React.FC<NotesModalProps> = ({visible, notes, onNotesChange, onSave, onCancel}) => {
+    const { colors } = useTheme();
+
     return (
         <Modal visible={visible} animationType="slide" transparent>
-            <View style={styles.modalOverlay}>
-                <View style={styles.notesModal}>
-                    <View style={styles.notesHeader}>
-                        <Text style={styles.notesHeaderText}>Exercise Notes</Text>
+            <View style={[styles.modalOverlay, { backgroundColor: colors.overlay }]}>
+                <View style={[styles.notesModal, { backgroundColor: colors.card }]}>
+                    <View style={[styles.notesHeader, { borderBottomColor: colors.border, backgroundColor: colors.surface }]}>
+                        <Text style={[styles.notesHeaderText, { color: colors.textPrimary }]}>Exercise Notes</Text>
                     </View>
                     <TextInput
-                        style={styles.notesInput}
+                        style={[styles.notesInput, { color: colors.textPrimary, backgroundColor: colors.card }]}
                         multiline
                         placeholder="Add notes for this exercise..."
+                        placeholderTextColor={colors.textMuted}
                         value={notes}
                         onChangeText={onNotesChange}
                         textAlignVertical="top"
                     />
-                    <View style={styles.notesButtonContainer}>
+                    <View style={[styles.notesButtonContainer, { borderTopColor: colors.border }]}>
                         <TouchableOpacity
                             onPress={onCancel}
-                            style={[styles.notesButton, styles.cancelButton]}
+                            style={[styles.notesButton, { backgroundColor: colors.textMuted }]}
                         >
                             <Text style={{color: 'white', fontWeight: '600'}}>Cancel</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
                             onPress={onSave}
-                            style={[styles.notesButton, styles.saveNotesButton]}
+                            style={[styles.notesButton, { backgroundColor: colors.primaryAction }]}
                         >
                             <Text style={{color: 'white', fontWeight: '600'}}>Save</Text>
                         </TouchableOpacity>
@@ -48,12 +52,10 @@ export const NotesModal: React.FC<NotesModalProps> = ({visible, notes, onNotesCh
 const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
         justifyContent: 'center',
         alignItems: 'center',
     },
     notesModal: {
-        backgroundColor: 'white',
         borderRadius: 16,
         width: '90%',
         height: '70%',
@@ -68,13 +70,10 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         paddingHorizontal: 20,
         borderBottomWidth: 1,
-        borderBottomColor: '#E0E0E0',
-        backgroundColor: '#F8F9FA',
     },
     notesHeaderText: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#333',
     },
     notesInput: {
         flex: 1,
@@ -87,7 +86,6 @@ const styles = StyleSheet.create({
         gap: 12,
         padding: 16,
         borderTopWidth: 1,
-        borderTopColor: '#E0E0E0',
     },
     notesButton: {
         flex: 1,
@@ -95,11 +93,5 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         borderRadius: 8,
         alignItems: 'center',
-    },
-    cancelButton: {
-        backgroundColor: '#6c757d',
-    },
-    saveNotesButton: {
-        backgroundColor: '#007AFF',
     },
 });

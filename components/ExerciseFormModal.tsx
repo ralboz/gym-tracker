@@ -1,19 +1,21 @@
-import React, {useCallback, useEffect, useState} from "react";
+import { createExercise, deleteExercise, updateExercise } from "@/data/dataUtils";
+import { getMuscleGroupOptions } from "@/data/muscleGroups";
+import { Exercise, MuscleGroup } from "@/data/types";
+import { Ionicons } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
+import React, { useCallback, useEffect, useState } from "react";
 import {
+    Alert,
     Modal,
     Pressable,
     StyleSheet,
     Text,
     TextInput,
-    View,
-    Alert, TouchableOpacity,
+    TouchableOpacity,
+    View
 } from "react-native";
-import {Picker} from "@react-native-picker/picker";
-import {Exercise, MuscleGroup} from "@/data/types";
-import {createExercise, updateExercise, deleteExercise} from "@/data/dataUtils";
-import {getMuscleGroupOptions} from "@/data/muscleGroups";
 import Toast from "react-native-toast-message";
-import {Ionicons} from "@expo/vector-icons";
+import { useTheme } from "@/theme/useTheme";
 
 interface ExerciseFormModalProps {
     visible: boolean;
@@ -23,6 +25,7 @@ interface ExerciseFormModalProps {
 }
 
 export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({visible, onClose, exerciseToEdit = null, onExerciseUpdated}) => {
+    const { colors } = useTheme();
 
     const [exercise, setExercise] = useState<Omit<Exercise, "id">>({
         name: "",
@@ -144,47 +147,50 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({visible, on
             statusBarTranslucent
             onRequestClose={onClose}
         >
-            <View style={styles.modalOverlay}>
-                <View style={styles.modalCard}>
+            <View style={[styles.modalOverlay, { backgroundColor: colors.overlay }]}>
+                <View style={[styles.modalCard, { backgroundColor: colors.card }]}>
                     <View style={styles.headerRow}>
-                        <Text style={styles.headingText}>
+                        <Text style={[styles.headingText, { color: colors.textPrimary }]}>
                             {isEditMode ? 'Edit Exercise' : 'Add New Exercise'}
                         </Text>
                         {isEditMode && (
                             <TouchableOpacity
                                 onPress={handleDeleteExercise}
-                                style={styles.deleteExerciseBtn}
+                                style={[styles.deleteExerciseBtn, { backgroundColor: colors.surface }]}
                             >
-                                <Ionicons name="trash-sharp" size={20} color="#FF3B30"/>
+                                <Ionicons name="trash-sharp" size={20} color={colors.destructiveAction}/>
                             </TouchableOpacity>
                         )}
                     </View>
 
                     <View style={styles.section}>
                         <TextInput
-                            style={styles.exerciseInput}
+                            style={[styles.exerciseInput, { borderColor: colors.border, backgroundColor: colors.inputBackground, color: colors.textPrimary }]}
                             placeholder="Exercise name..."
                             value={exercise.name}
                             onChangeText={alterExerciseField}
                             autoFocus={!isEditMode}
-                            placeholderTextColor="#9CA3AF"
+                            placeholderTextColor={colors.textMuted}
                         />
                     </View>
 
                     <View style={styles.section}>
-                        <Text style={styles.label}>Primary Muscle Group *</Text>
-                        <View style={styles.pickerContainer}>
+                        <Text style={[styles.label, { color: colors.textSecondary }]}>Primary Muscle Group *</Text>
+                        <View style={[styles.pickerContainer, { borderColor: colors.border, backgroundColor: colors.inputBackground }]}>
                             <Picker
                                 selectedValue={exercise.primary_muscle_group_id}
                                 onValueChange={updatePrimaryMuscle}
-                                style={styles.picker}
-                                itemStyle={styles.pickerItem}
+                                style={[styles.picker, { color: colors.textPrimary, backgroundColor: colors.inputBackground }]}
+                                itemStyle={[styles.pickerItem, { color: colors.textPrimary, backgroundColor: colors.inputBackground }]}
+                                dropdownIconColor={colors.textPrimary}
                             >
                                 {muscleGroups.map(group => (
                                     <Picker.Item
                                         key={group.value}
                                         label={group.label}
                                         value={group.value}
+                                        color={colors.textPrimary}
+                                        style={{ backgroundColor: colors.inputBackground }}
                                     />
                                 ))}
                             </Picker>
@@ -192,20 +198,23 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({visible, on
                     </View>
 
                     <View style={styles.section}>
-                        <Text style={styles.label}>Secondary Muscle Group</Text>
-                        <View style={styles.pickerContainer}>
+                        <Text style={[styles.label, { color: colors.textSecondary }]}>Secondary Muscle Group</Text>
+                        <View style={[styles.pickerContainer, { borderColor: colors.border, backgroundColor: colors.inputBackground }]}>
                             <Picker
                                 selectedValue={exercise.secondary_muscle_group_id ?? null}
                                 onValueChange={updateSecondaryMuscle}
-                                style={styles.picker}
-                                itemStyle={styles.pickerItem}
+                                style={[styles.picker, { color: colors.textPrimary, backgroundColor: colors.inputBackground }]}
+                                itemStyle={[styles.pickerItem, { color: colors.textPrimary, backgroundColor: colors.inputBackground }]}
+                                dropdownIconColor={colors.textPrimary}
                             >
-                                <Picker.Item label="None" value={null} />
+                                <Picker.Item label="None" value={null} color={colors.textPrimary} style={{ backgroundColor: colors.inputBackground }} />
                                 {muscleGroups.map(group => (
                                     <Picker.Item
                                         key={group.value}
                                         label={group.label}
                                         value={group.value}
+                                        color={colors.textPrimary}
+                                        style={{ backgroundColor: colors.inputBackground }}
                                     />
                                 ))}
                             </Picker>
@@ -214,10 +223,10 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({visible, on
 
                     <View style={styles.footerRow}>
                         <View style={styles.rightButtons}>
-                            <Pressable style={styles.secondaryButton} onPress={onClose}>
-                                <Text style={styles.secondaryButtonText}>Cancel</Text>
+                            <Pressable style={[styles.secondaryButton, { borderColor: colors.border, backgroundColor: colors.card }]} onPress={onClose}>
+                                <Text style={[styles.secondaryButtonText, { color: colors.textSecondary }]}>Cancel</Text>
                             </Pressable>
-                            <Pressable style={styles.addButton} onPress={handleSaveExercise}>
+                            <Pressable style={[styles.addButton, { backgroundColor: colors.primaryAction }]} onPress={handleSaveExercise}>
                                 <Text style={styles.addButtonText}>
                                     {isEditMode ? 'Save Changes' : 'Add Exercise'}
                                 </Text>
@@ -233,14 +242,12 @@ export const ExerciseFormModal: React.FC<ExerciseFormModalProps> = ({visible, on
 const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
-        backgroundColor: "rgba(15, 23, 42, 0.5)",
         justifyContent: "center",
         alignItems: "center",
         paddingHorizontal: 16,
     },
     modalCard: {
         width: "100%",
-        backgroundColor: "#FFFFFF",
         borderRadius: 16,
         paddingHorizontal: 16,
         paddingTop: 16,
@@ -261,11 +268,9 @@ const styles = StyleSheet.create({
     headingText: {
         fontSize: 20,
         fontWeight: "600",
-        color: "#111827",
     },
     closeText: {
         fontSize: 18,
-        color: "#6B7280",
     },
     section: {
         rowGap: 6,
@@ -273,24 +278,17 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 14,
         fontWeight: "500",
-        color: "#4B5563",
     },
     exerciseInput: {
         borderWidth: 1,
-        borderColor: "#E5E7EB",
         borderRadius: 10,
         paddingHorizontal: 14,
         paddingVertical: 12,
         fontSize: 16,
-        backgroundColor: "#F9FAFB",
-        color: "#111827",
     },
     pickerContainer: {
-        borderWidth: 1,
-        borderColor: "#E5E7EB",
         borderRadius: 10,
         overflow: "hidden",
-        backgroundColor: "#F9FAFB",
     },
     picker: {
         height: 60,
@@ -310,23 +308,19 @@ const styles = StyleSheet.create({
         columnGap: 8,
     },
     secondaryButton: {
-        paddingHorizontal: 14,
+        paddingHorizontal: 18,
         paddingVertical: 10,
-        borderRadius: 999,
+        borderRadius: 5,
         borderWidth: 1,
-        borderColor: "#D1D5DB",
-        backgroundColor: "#FFFFFF",
     },
     secondaryButtonText: {
         fontSize: 14,
         fontWeight: "500",
-        color: "#374151",
     },
     addButton: {
-        backgroundColor: "#007AFF",
         paddingHorizontal: 18,
         paddingVertical: 10,
-        borderRadius: 999,
+        borderRadius: 5,
         alignItems: "center",
         justifyContent: "center",
     },
@@ -336,7 +330,6 @@ const styles = StyleSheet.create({
         fontWeight: "600",
     },
     deleteExerciseBtn: {
-        backgroundColor: '#f8f9fa',
         padding: 8,
         borderRadius: 8,
     },

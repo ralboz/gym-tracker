@@ -2,6 +2,7 @@ import { WorkoutExerciseDTO, WorkoutSetDTO } from '@/data/types';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useTheme } from '@/theme/useTheme';
 
 interface ExerciseCardProps {
     workoutExercise: WorkoutExerciseDTO;
@@ -21,47 +22,49 @@ interface ExerciseCardProps {
 
 export const ExerciseCard: React.FC<ExerciseCardProps> = ({workoutExercise, onDeleteExercise, onAddSet, onDeleteSet, onDuplicateSet, onEditSet, onShowNotes, onShowExerciseInfo}) =>
 {
+    const { colors } = useTheme();
+
     return (
-        <View style={styles.exerciseCard}>
+        <View style={[styles.exerciseCard, { borderColor: colors.border, backgroundColor: colors.card }]}>
             <View style={styles.exerciseHeader}>
-                <Text style={styles.exerciseName}>{workoutExercise.name}</Text>
+                <Text style={[styles.exerciseName, { color: colors.textPrimary }]}>{workoutExercise.name}</Text>
                 <TouchableOpacity
                     onPress={() => onDeleteExercise(workoutExercise.id)}
-                    style={styles.deleteExerciseBtn}
+                    style={[styles.deleteExerciseBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
                 >
-                    <Ionicons name="trash-sharp" size={20} color="#FF3B30"/>
+                    <Ionicons name="trash-sharp" size={20} color={colors.destructiveAction}/>
                 </TouchableOpacity>
             </View>
 
             <View style={styles.setsContainer}>
                 {workoutExercise.sets.map((set, index) => (
-                    <View key={set.id} style={styles.setRow}>
+                    <View key={set.id} style={[styles.setRow, { backgroundColor: colors.surface }]}>
                         <View style={styles.setInfo}>
-                            <Text style={{fontSize: 16, minWidth: 50}}>Set {index + 1}:</Text>
+                            <Text style={{fontSize: 16, minWidth: 50, color: colors.textPrimary}}>Set {index + 1}:</Text>
                             <TouchableOpacity
                                 onPress={() => onEditSet(workoutExercise, set, index, 'weight')}
                             >
-                                <Text style={styles.editableField}>{set.weight} kg</Text>
+                                <Text style={[styles.editableField, { color: colors.primaryAction }]}>{set.weight} kg</Text>
                             </TouchableOpacity>
-                            <Text style={{fontSize: 16}}>×</Text>
+                            <Text style={{fontSize: 16, color: colors.textPrimary}}>×</Text>
                             <TouchableOpacity
                                 onPress={() => onEditSet(workoutExercise, set, index, 'reps')}
                             >
-                                <Text style={styles.editableField}>{set.reps} reps</Text>
+                                <Text style={[styles.editableField, { color: colors.primaryAction }]}>{set.reps} reps</Text>
                             </TouchableOpacity>
                         </View>
                         <View style={styles.setActions}>
                             <TouchableOpacity
                                 onPress={() => onDuplicateSet(workoutExercise.id, set)}
-                                style={styles.duplicateSetBtn}
+                                style={[styles.duplicateSetBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
                             >
-                                <Ionicons name="copy-outline" size={16} color="#007AFF"/>
+                                <Ionicons name="copy-outline" size={16} color={colors.primaryAction}/>
                             </TouchableOpacity>
                             <TouchableOpacity
                                 onPress={() => onDeleteSet(set.id)}
-                                style={styles.deleteSetBtn}
+                                style={[styles.deleteSetBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
                             >
-                                <Ionicons name="trash-sharp" size={16} color="#FF3B30"/>
+                                <Ionicons name="trash-sharp" size={16} color={colors.destructiveAction}/>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -71,21 +74,21 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({workoutExercise, onDe
             <View style={styles.actionButtons}>
                 <TouchableOpacity
                     onPress={() => onAddSet(workoutExercise.id)}
-                    style={styles.actionBtn}
+                    style={[styles.actionBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
                 >
-                    <Ionicons name="add" size={20} color="#007AFF"/>
+                    <Ionicons name="add" size={20} color={colors.primaryAction}/>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() => onShowNotes(workoutExercise)}
-                    style={styles.actionBtn}
+                    style={[styles.actionBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
                 >
-                    <Ionicons name="create-outline" size={20} color="#007AFF"/>
+                    <Ionicons name="create-outline" size={20} color={colors.primaryAction}/>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() => onShowExerciseInfo(workoutExercise)}
-                    style={styles.actionBtn}
+                    style={[styles.actionBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
                 >
-                    <Ionicons name="information-circle-outline" size={20} color="#007AFF"/>
+                    <Ionicons name="information-circle-outline" size={20} color={colors.primaryAction}/>
                 </TouchableOpacity>
             </View>
         </View>
@@ -95,10 +98,8 @@ export const ExerciseCard: React.FC<ExerciseCardProps> = ({workoutExercise, onDe
 const styles = StyleSheet.create({
     exerciseCard: {
         borderWidth: 1,
-        borderColor: "#ddd",
         padding: 15,
         marginBottom: 15,
-        backgroundColor: 'white',
         borderRadius: 12,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
@@ -117,9 +118,9 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     deleteExerciseBtn: {
-        backgroundColor: '#f8f9fa',
         padding: 8,
         borderRadius: 8,
+        borderWidth: 1,
     },
     setsContainer: {
         flexDirection: "column",
@@ -130,7 +131,6 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         padding: 12,
-        backgroundColor: '#f8f9fa',
         borderRadius: 8,
     },
     setInfo: {
@@ -141,17 +141,16 @@ const styles = StyleSheet.create({
     editableField: {
         fontSize: 18,
         textDecorationLine: 'underline',
-        color: '#007AFF',
     },
     deleteSetBtn: {
-        backgroundColor: '#f8f9fa',
         padding: 6,
         borderRadius: 6,
+        borderWidth: 1,
     },
     duplicateSetBtn: {
-        backgroundColor: '#f8f9fa',
         padding: 6,
         borderRadius: 6,
+        borderWidth: 1,
     },
     setActions: {
         flexDirection: "row",
@@ -166,7 +165,7 @@ const styles = StyleSheet.create({
     actionBtn: {
         paddingHorizontal: 12,
         paddingVertical: 8,
-        backgroundColor: '#f8f9fa',
         borderRadius: 8,
+        borderWidth: 1,
     },
 });

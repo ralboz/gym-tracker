@@ -11,6 +11,7 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
+import { useTheme } from "@/theme/useTheme";
 
 interface ExerciseInfoModalProps {
     visible: boolean;
@@ -20,6 +21,7 @@ interface ExerciseInfoModalProps {
 }
 
 export const ExerciseInfoModal: React.FC<ExerciseInfoModalProps> = ({visible, exercise, onClose, onDuplicateExerciseSets}) => {
+    const { colors } = useTheme();
     const [history, setHistory] = useState<ExerciseHistory | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -46,22 +48,22 @@ export const ExerciseInfoModal: React.FC<ExerciseInfoModalProps> = ({visible, ex
 
     return (
         <Modal visible={visible} animationType="slide" transparent>
-            <View style={styles.modalOverlay}>
-                <View style={styles.modalContent}>
+            <View style={[styles.modalOverlay, { backgroundColor: colors.overlay }]}>
+                <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
                     {/* Header */}
-                    <View style={styles.header}>
-                        <Text style={styles.headerTitle} numberOfLines={2}>
+                    <View style={[styles.header, { borderBottomColor: colors.border, backgroundColor: colors.surface }]}>
+                        <Text style={[styles.headerTitle, { color: colors.textPrimary }]} numberOfLines={2}>
                             {exercise?.name || 'Exercise Info'}
                         </Text>
                         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                            <Ionicons name="close" size={24} color="#666" />
+                            <Ionicons name="close" size={24} color={colors.textMuted} />
                         </TouchableOpacity>
                     </View>
 
                     {loading ? (
                         <View style={styles.loadingContainer}>
-                            <ActivityIndicator size="large" color="#007AFF" />
-                            <Text style={styles.loadingText}>Loading history...</Text>
+                            <ActivityIndicator size="large" color={colors.primaryAction} />
+                            <Text style={[styles.loadingText, { color: colors.textMuted }]}>Loading history...</Text>
                         </View>
                     ) : (
                         <ScrollView
@@ -73,20 +75,20 @@ export const ExerciseInfoModal: React.FC<ExerciseInfoModalProps> = ({visible, ex
                                 <View style={styles.section}>
                                     <View style={styles.sectionHeader}>
                                         <Ionicons name="trophy" size={24} color="#FFD700" />
-                                        <Text style={styles.sectionTitle}>Personal Record</Text>
+                                        <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Personal Record</Text>
                                     </View>
                                     <View style={styles.prCard}>
                                         <View style={styles.prRow}>
-                                            <Text style={styles.prLabel}>Weight</Text>
-                                            <Text style={styles.prValue}>{history.prSet.weight} kg</Text>
+                                            <Text style={[styles.prLabel, { color: '#666' }]}>Weight</Text>
+                                            <Text style={[styles.prValue, { color: '#333' }]}>{history.prSet.weight} kg</Text>
                                         </View>
                                         <View style={styles.prRow}>
-                                            <Text style={styles.prLabel}>Reps</Text>
-                                            <Text style={styles.prValue}>{history.prSet.reps}</Text>
+                                            <Text style={[styles.prLabel, { color: '#666' }]}>Reps</Text>
+                                            <Text style={[styles.prValue, { color: '#333' }]}>{history.prSet.reps}</Text>
                                         </View>
                                         <View style={styles.prRow}>
-                                            <Text style={styles.prLabel}>Total Volume</Text>
-                                            <Text style={styles.prValue}>
+                                            <Text style={[styles.prLabel, { color: '#666' }]}>Total Volume</Text>
+                                            <Text style={[styles.prValue, { color: '#333' }]}>
                                                 {(history.prSet.weight * history.prSet.reps).toFixed(1)} kg
                                             </Text>
                                         </View>
@@ -94,15 +96,15 @@ export const ExerciseInfoModal: React.FC<ExerciseInfoModalProps> = ({visible, ex
                                 </View>
                             ) : (
                                 <View style={styles.section}>
-                                    <Text style={styles.emptyText}>No workout history yet</Text>
+                                    <Text style={[styles.emptyText, { color: colors.textMuted }]}>No workout history yet</Text>
                                 </View>
                             )}
 
                             {history?.recentWorkouts && history.recentWorkouts.length > 0 && (
                                 <View style={styles.section}>
                                     <View style={styles.sectionHeader}>
-                                        <Ionicons name="calendar" size={22} color="#007AFF" />
-                                        <Text style={styles.sectionTitle}>Recent Workouts</Text>
+                                        <Ionicons name="calendar" size={22} color={colors.primaryAction} />
+                                        <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>Recent Workouts</Text>
                                     </View>
 
                                     {history.recentWorkouts.map((workout) => {
@@ -118,21 +120,21 @@ export const ExerciseInfoModal: React.FC<ExerciseInfoModalProps> = ({visible, ex
                                         );
 
                                         return (
-                                            <View key={workout.id} style={styles.workoutCard}>
+                                            <View key={workout.id} style={[styles.workoutCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                                                 <View style={styles.workoutHeader}>
-                                                    <Text style={styles.workoutDate}>
+                                                    <Text style={[styles.workoutDate, { color: colors.textPrimary }]}>
                                                         {formatDate(workout.created_date)}
                                                     </Text>
                                                     <View style={styles.workoutHeaderRight}>
-                                                        <Text style={styles.workoutVolume}>
+                                                        <Text style={[styles.workoutVolume, { color: colors.primaryAction }]}>
                                                             {totalVolume.toFixed(0)} kg total
                                                         </Text>
                                                         {onDuplicateExerciseSets && (
                                                             <TouchableOpacity
                                                                 onPress={() => onDuplicateExerciseSets(exercise!.id, exerciseInstance.sets)}
-                                                                style={styles.duplicateWorkoutBtn}
+                                                                style={[styles.duplicateWorkoutBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
                                                             >
-                                                                <Ionicons name="copy-outline" size={18} color="#007AFF" />
+                                                                <Ionicons name="copy-outline" size={18} color={colors.primaryAction} />
                                                             </TouchableOpacity>
                                                         )}
                                                     </View>
@@ -140,8 +142,8 @@ export const ExerciseInfoModal: React.FC<ExerciseInfoModalProps> = ({visible, ex
 
                                                 <View style={styles.setsGrid}>
                                                     {exerciseInstance.sets.map((set) => (
-                                                        <View key={set.id} style={styles.setChip}>
-                                                            <Text style={styles.setChipText}>
+                                                        <View key={set.id} style={[styles.setChip, { backgroundColor: colors.card, borderColor: colors.primaryAction }]}>
+                                                            <Text style={[styles.setChipText, { color: colors.primaryAction }]}>
                                                                 {set.weight}kg × {set.reps}
                                                             </Text>
                                                         </View>
@@ -149,9 +151,9 @@ export const ExerciseInfoModal: React.FC<ExerciseInfoModalProps> = ({visible, ex
                                                 </View>
 
                                                 {exerciseInstance.notes && (
-                                                    <View style={styles.notesContainer}>
-                                                        <Ionicons name="document-text-outline" size={14} color="#666" />
-                                                        <Text style={styles.notesText}>
+                                                    <View style={[styles.notesContainer, { borderTopColor: colors.border }]}>
+                                                        <Ionicons name="document-text-outline" size={14} color={colors.textMuted} />
+                                                        <Text style={[styles.notesText, { color: colors.textMuted }]}>
                                                             {exerciseInstance.notes}
                                                         </Text>
                                                     </View>
@@ -172,13 +174,11 @@ export const ExerciseInfoModal: React.FC<ExerciseInfoModalProps> = ({visible, ex
 const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
     },
     modalContent: {
-        backgroundColor: 'white',
         borderRadius: 20,
         width: '100%',
         height: '90%',
@@ -195,13 +195,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: 20,
         borderBottomWidth: 1,
-        borderBottomColor: '#E0E0E0',
-        backgroundColor: '#F8F9FA',
     },
     headerTitle: {
         fontSize: 20,
         fontWeight: '700',
-        color: '#333',
         flex: 1,
         marginRight: 12,
     },
@@ -216,7 +213,6 @@ const styles = StyleSheet.create({
     },
     loadingText: {
         marginTop: 12,
-        color: '#666',
         fontSize: 14,
     },
     scrollView: {
@@ -238,7 +234,6 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 18,
         fontWeight: '700',
-        color: '#333',
     },
     prCard: {
         backgroundColor: '#FFF9E6',
@@ -255,21 +250,17 @@ const styles = StyleSheet.create({
     },
     prLabel: {
         fontSize: 16,
-        color: '#666',
         fontWeight: '500',
     },
     prValue: {
         fontSize: 20,
         fontWeight: '700',
-        color: '#333',
     },
     workoutCard: {
-        backgroundColor: '#F8F9FA',
         borderRadius: 12,
         padding: 16,
         marginBottom: 12,
         borderWidth: 1,
-        borderColor: '#E0E0E0',
     },
     workoutHeader: {
         flexDirection: 'row',
@@ -285,11 +276,9 @@ const styles = StyleSheet.create({
     workoutDate: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#333',
     },
     workoutVolume: {
         fontSize: 14,
-        color: '#007AFF',
         fontWeight: '600',
     },
     setsGrid: {
@@ -298,16 +287,13 @@ const styles = StyleSheet.create({
         gap: 8,
     },
     setChip: {
-        backgroundColor: 'white',
         paddingHorizontal: 12,
         paddingVertical: 6,
         borderRadius: 8,
         borderWidth: 1,
-        borderColor: '#007AFF',
     },
     setChipText: {
         fontSize: 14,
-        color: '#007AFF',
         fontWeight: '600',
     },
     notesContainer: {
@@ -316,24 +302,21 @@ const styles = StyleSheet.create({
         marginTop: 12,
         paddingTop: 12,
         borderTopWidth: 1,
-        borderTopColor: '#E0E0E0',
         gap: 6,
     },
     notesText: {
         fontSize: 14,
-        color: '#666',
         fontStyle: 'italic',
         flex: 1,
     },
     emptyText: {
         fontSize: 16,
-        color: '#999',
         textAlign: 'center',
         paddingVertical: 40,
     },
     duplicateWorkoutBtn: {
-        backgroundColor: '#E8F0FE',
         padding: 6,
         borderRadius: 6,
+        borderWidth: 1,
     },
 });
