@@ -1,3 +1,7 @@
+import { MUSCLE_GROUPS } from '@/data/muscleGroups';
+import { Exercise, MuscleGroup } from "@/data/types";
+import { Ionicons } from '@expo/vector-icons';
+import React, { useMemo, useState } from "react";
 import {
     FlatList,
     Modal,
@@ -8,18 +12,16 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import React, {useMemo, useState} from "react";
-import {Exercise, MuscleGroup} from "@/data/types";
-import { MUSCLE_GROUPS } from '@/data/muscleGroups';
 
 interface ExerciseSearchModalProps {
     visible: boolean;
     availableExercises: Exercise[];
     onSelectExercise: (exercise: Exercise) => void;
     onClose: () => void;
+    onCreateExercise?: () => void;
 }
 
-export const ExerciseSearchModal: React.FC<ExerciseSearchModalProps> = ({visible, availableExercises, onSelectExercise, onClose}) =>
+export const ExerciseSearchModal: React.FC<ExerciseSearchModalProps> = ({visible, availableExercises, onSelectExercise, onClose, onCreateExercise}) =>
 {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedMuscle, setSelectedMuscle] = useState<MuscleGroup | null>(null);
@@ -52,14 +54,24 @@ export const ExerciseSearchModal: React.FC<ExerciseSearchModalProps> = ({visible
         <Modal visible={visible} animationType="slide" transparent>
             <View style={styles.modalOverlay}>
                 <View style={styles.modalContent}>
-                    {/* Search Input - Fixed */}
-                    <TextInput
-                        style={styles.searchInput}
-                        placeholder="Search exercises..."
-                        value={searchQuery}
-                        onChangeText={setSearchQuery}
-                        autoFocus
-                    />
+                    <View style={styles.searchRow}>
+                        <TextInput
+                            style={[styles.searchInput, { flex: 1 }]}
+                            placeholder="Search exercises..."
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
+                            autoFocus
+                        />
+                        {onCreateExercise && (
+                            <TouchableOpacity
+                                onPress={onCreateExercise}
+                                style={styles.createButton}
+                                testID="create-exercise-button"
+                            >
+                                <Ionicons name="add-circle-outline" size={28} color="#007AFF" />
+                            </TouchableOpacity>
+                        )}
+                    </View>
 
                     {/* Muscle Filters - Fixed */}
                     <ScrollView
@@ -145,13 +157,21 @@ const styles = StyleSheet.create({
         elevation: 10,
         overflow: 'hidden',
     },
-    searchInput: {
+    searchRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
         borderBottomWidth: 1,
         borderBottomColor: '#E0E0E0',
+        backgroundColor: '#F8F9FA',
+    },
+    searchInput: {
         paddingVertical: 16,
         paddingHorizontal: 20,
         fontSize: 16,
-        backgroundColor: '#F8F9FA',
+    },
+    createButton: {
+        paddingHorizontal: 12,
+        paddingVertical: 8,
     },
     muscleFilterRow: {
         flexDirection: 'row',

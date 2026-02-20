@@ -1,4 +1,5 @@
 import { ExerciseCard } from "@/components/ExerciseCard";
+import { ExerciseFormModal } from "@/components/ExerciseFormModal";
 import { ExerciseInfoModal } from "@/components/ExerciseInfoModal";
 import { ExerciseSearchModal } from "@/components/ExerciseSearchModal";
 import { NotesModal } from "@/components/NotesModal";
@@ -49,6 +50,7 @@ export default function AddScreen() {
     const [isExerciseSearchModalVisible, setIsExerciseSearchModalVisible] = useState(false);
     const [isNotesModalVisible, setIsNotesModalVisible] = useState(false);
     const [isNumberWheelVisible, setIsNumberWheelVisible] = useState(false);
+    const [isExerciseFormVisible, setIsExerciseFormVisible] = useState(false);
     const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
     const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
 
@@ -189,6 +191,24 @@ export default function AddScreen() {
         setIsExerciseSearchModalVisible(false);
     }, []);
 
+    const handleCreateExercise = useCallback(() => {
+        setIsExerciseFormVisible(true);
+    }, []);
+
+    const handleExerciseCreated = useCallback(async () => {
+        const allExercises = await loadExercises();
+        setAvailableExercises(allExercises);
+
+        // Find the newly created exercise and add it to the current workout
+        const newExercise = allExercises.reduce((max, ex) => ex.id > max.id ? ex : max, allExercises[0]);
+        if (newExercise) {
+            handleAddExercise(newExercise);
+        }
+
+        setIsExerciseFormVisible(false);
+        setIsExerciseSearchModalVisible(false);
+    }, [handleAddExercise]);
+
     const handleDeleteExercise = useCallback((exerciseId: number) => {
         setExercises(prev => prev.filter(ex => ex.id !== exerciseId));
     }, []);
@@ -225,6 +245,14 @@ export default function AddScreen() {
                 exercise.id === exerciseId
                     ? { ...exercise, sets: [...exercise.sets, newSet] }
                     : exercise
+            )
+        );
+    }, []);
+
+    const updateExerciseSets = useCallback((exerciseId: number, updateFn: (sets: WorkoutSetDTO[]) => WorkoutSetDTO[]) => {
+        setExercises(prev =>
+            prev.map(exercise =>
+                exercise.id === exerciseId ? { ...exercise, sets: updateFn(exercise.sets) } : exercise
             )
         );
     }, []);
@@ -279,15 +307,7 @@ export default function AddScreen() {
         }
 
         resetEditingState();
-    }, [currentEditingWorkout, editingSetIndex, editingField, wheelValue, pendingSet]);
-
-    const updateExerciseSets = useCallback((exerciseId: number, updateFn: (sets: WorkoutSetDTO[]) => WorkoutSetDTO[]) => {
-        setExercises(prev =>
-            prev.map(exercise =>
-                exercise.id === exerciseId ? { ...exercise, sets: updateFn(exercise.sets) } : exercise
-            )
-        );
-    }, []);
+    }, [currentEditingWorkout, editingField, wheelValue, editingSetIndex, pendingSet?.weight, updateExerciseSets]);
 
     const handleShowNoteInput = useCallback((workoutExercise: WorkoutExerciseDTO) => {
         setCurrentEditingWorkout(workoutExercise);
@@ -420,6 +440,7 @@ export default function AddScreen() {
                 availableExercises={availableExercises}
                 onSelectExercise={handleAddExercise}
                 onClose={() => setIsExerciseSearchModalVisible(false)}
+                onCreateExercise={handleCreateExercise}
             />
 
             <ExerciseInfoModal
@@ -427,6 +448,13 @@ export default function AddScreen() {
                 exercise={selectedExercise}
                 onClose={() => setIsInfoModalVisible(false)}
                 onDuplicateExerciseSets={handleDuplicateExerciseSets}
+            />
+
+            <ExerciseFormModal
+                visible={isExerciseFormVisible}
+                exerciseToEdit={null}
+                onClose={() => setIsExerciseFormVisible(false)}
+                onExerciseUpdated={handleExerciseCreated}
             />
 
         </View>
