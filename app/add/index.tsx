@@ -6,7 +6,7 @@ import { NotesModal } from "@/components/NotesModal";
 import { NumberWheelModal } from "@/components/NumberWheelModal";
 import { loadExercises } from "@/data/dataUtils";
 import { Exercise, WorkoutDTO, WorkoutExerciseDTO, WorkoutSetDTO } from "@/data/types";
-import { deleteWorkout, saveNewWorkout, updateWorkout } from "@/data/workoutsUtils";
+import { deleteWorkout, loadWorkoutById, saveNewWorkout, updateWorkout } from "@/data/workoutsUtils";
 import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
@@ -38,7 +38,7 @@ const EmptyState = () => (
 
 export default function AddScreen() {
     const router = useRouter();
-    const { workout: workoutParam } = useLocalSearchParams<{ workout?: string; }>();
+    const { workoutId: workoutIdParam } = useLocalSearchParams<{ workoutId?: string; }>();
 
     // Main state
     const [currentWorkout, setCurrentWorkout] = useState<WorkoutDTO | null>(null);
@@ -94,10 +94,12 @@ export default function AddScreen() {
                     setAvailableExercises(allExercises);
 
                     // Load current workout if editing
-                    if (workoutParam) {
-                        const parsedWorkout = JSON.parse(decodeURIComponent(workoutParam as string));
-                        setCurrentWorkout(parsedWorkout);
-                        setExercises(parsedWorkout.exercises || []);
+                    if (workoutIdParam) {
+                        const workout = await loadWorkoutById(Number(workoutIdParam));
+                        if (workout) {
+                            setCurrentWorkout(workout);
+                            setExercises(workout.exercises || []);
+                        }
                     }
                 } catch (error) {
                     console.error('Failed to initialize data:', error);
@@ -107,7 +109,7 @@ export default function AddScreen() {
             };
 
             initializeData();
-        }, [workoutParam])
+        }, [workoutIdParam])
     );
 
     // Handlers
@@ -152,7 +154,7 @@ export default function AddScreen() {
     }, [exercises, currentWorkout, router]);
 
     const handleDeleteWorkout = useCallback(() => {
-        if(!workoutParam) {
+        if(!workoutIdParam) {
             // early return for case that user clicked to add new workout but didnt add anything to it yet
             resetState();
             router.push('/');
@@ -179,7 +181,7 @@ export default function AddScreen() {
                 ]
             );
         }
-    }, [workoutParam, currentWorkout, router]);
+    }, [workoutIdParam, currentWorkout, router]);
 
     const handleAddExercise = useCallback(async (exercise: Exercise) => {
         const newWorkoutExercise: WorkoutExerciseDTO = {

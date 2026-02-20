@@ -1,15 +1,15 @@
-import React, {useCallback, useState} from 'react';
+import { WorkoutDTO } from '@/data/types';
+import { loadWorkouts } from '@/data/workoutsUtils';
+import { useFocusEffect } from "@react-navigation/native";
+import { useRouter } from "expo-router";
+import React, { useCallback, useState } from 'react';
 import {
-    View,
-    Text,
-    TouchableOpacity,
     FlatList,
     StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
-import { loadWorkouts } from '@/data/workoutsUtils';
-import { WorkoutDTO } from '@/data/types';
-import {useRouter} from "expo-router";
-import {useFocusEffect} from "@react-navigation/native";
 
 export default function HomeScreen(){
     const [workouts, setWorkouts] = useState<WorkoutDTO[]>([]);
@@ -77,7 +77,7 @@ export default function HomeScreen(){
 
                 <View style={styles.cardActions}>
                     <TouchableOpacity style={styles.button} onPress={() => {
-                        router.push(`/add?workout=${encodeURIComponent(JSON.stringify(workout))}`);
+                        router.push(`/add?workoutId=${workout.id}`);
                     }}>
                         <Text style={styles.buttonText}>Edit</Text>
                     </TouchableOpacity>

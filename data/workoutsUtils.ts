@@ -8,6 +8,10 @@ export const loadWorkouts = async (): Promise<WorkoutDTO[]> => {
     if (!json) return [];
     return JSON.parse(json) as WorkoutDTO[];
 };
+export const loadWorkoutById = async (id: number): Promise<WorkoutDTO | null> => {
+    const workouts = await loadWorkouts();
+    return workouts.find(w => w.id === id) ?? null;
+};
 
 export const saveWorkouts = async (workouts: WorkoutDTO[]) => {
     await AsyncStorage.setItem(WORKOUTS_KEY, JSON.stringify(workouts));
