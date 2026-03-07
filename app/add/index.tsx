@@ -7,6 +7,8 @@ import { NumberWheelModal } from "@/components/NumberWheelModal";
 import { loadExercises } from "@/data/dataUtils";
 import { Exercise, WorkoutDTO, WorkoutExerciseDTO, WorkoutSetDTO } from "@/data/types";
 import { deleteWorkout, loadWorkoutById, saveNewWorkout, updateWorkout } from "@/data/workoutsUtils";
+import { ColorTokens } from "@/theme/theme";
+import { useTheme } from "@/theme/useTheme";
 import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
@@ -19,8 +21,6 @@ import {
     Text,
     View
 } from "react-native";
-import { ColorTokens } from "@/theme/theme";
-import { useTheme } from "@/theme/useTheme";
 
 const LoadingState = ({ colors }: { colors: ColorTokens }) => (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -157,8 +157,8 @@ export default function AddScreen() {
     }, [exercises, currentWorkout, router]);
 
     const handleDeleteWorkout = useCallback(() => {
-        if(!workoutIdParam) {
-            // early return for case that user clicked to add new workout but didnt add anything to it yet
+        if(!workoutIdParam && exercises.length === 0) {
+            // no existing workout and nothing added yet — just close
             resetState();
             router.push('/');
         }
@@ -184,7 +184,7 @@ export default function AddScreen() {
                 ]
             );
         }
-    }, [workoutIdParam, currentWorkout, router]);
+    }, [workoutIdParam, exercises.length, currentWorkout, router]);
 
     const handleAddExercise = useCallback(async (exercise: Exercise) => {
         const newWorkoutExercise: WorkoutExerciseDTO = {
