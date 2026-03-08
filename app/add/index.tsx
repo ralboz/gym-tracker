@@ -15,6 +15,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
+    BackHandler,
     DeviceEventEmitter,
     ScrollView,
     StyleSheet,
@@ -390,6 +391,18 @@ export default function AddScreen() {
             subscription3?.remove();
         };
     }, [exercises, currentWorkout, router, handleSaveWorkout, handleDeleteWorkout]);
+
+    // Handle Android back button only while this screen is focused
+    useFocusEffect(
+        useCallback(() => {
+            const onBackPress = () => {
+                handleDeleteWorkout();
+                return true;
+            };
+            const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+            return () => subscription.remove();
+        }, [handleDeleteWorkout])
+    );
 
     if (loading) {
         return (
